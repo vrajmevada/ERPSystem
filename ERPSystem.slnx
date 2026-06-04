@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="ERPSystem.API/ERPSystem.API.csproj" Id="81e6f2b8-2a8a-431a-a808-be232b7c5740" />
+  <Project Path="ERPSystem.Application/ERPSystem.Application.csproj" Id="6e8f7ae1-4183-4950-9765-eed2957d8360" />
+  <Project Path="ERPSystem.Domain/ERPSystem.Domain.csproj" Id="4fc13297-cfd9-4989-902a-5591ceab6191" />
+  <Project Path="ERPSystem.Infrastructure/ERPSystem.Infrastructure.csproj" Id="22c70549-4a97-4922-ad34-b45d88c75a58" />
+  <Project Path="ERPSystem.Persistence/ERPSystem.Persistence.csproj" Id="8df576cf-7a5a-4a2d-883d-ef4132e5148f" />
+</Solution>
