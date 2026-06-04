@@ -17,11 +17,18 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpGet]
+    [HttpGet]
     public async Task<IActionResult> GetAll()
     {
         var categories = await _repository.GetAllAsync();
 
-        return Ok(categories);
+        var result = categories.Select(c => new CategoryDto
+        {
+            Id = c.Id,
+            Name = c.Name
+        });
+
+        return Ok(result);
     }
 
     [HttpGet("{id}")]
@@ -32,7 +39,13 @@ public class CategoriesController : ControllerBase
         if (category == null)
             return NotFound();
 
-        return Ok(category);
+        var dto = new CategoryDto
+        {
+            Id = category.Id,
+            Name = category.Name
+        };
+
+        return Ok(dto);
     }
 
     [HttpPost]

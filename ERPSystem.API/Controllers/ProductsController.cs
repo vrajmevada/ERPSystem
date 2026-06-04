@@ -21,7 +21,16 @@ public class ProductsController : ControllerBase
     {
         var products = await _repository.GetAllAsync();
 
-        return Ok(products);
+        var result = products.Select(p => new ProductDto
+        {
+            Id = p.Id,
+            Name = p.Name,
+            Price = p.Price,
+            CategoryId = p.CategoryId,
+            CategoryName = p.Category.Name
+        });
+
+        return Ok(result);
     }
 
     [HttpGet("{id}")]
@@ -32,7 +41,16 @@ public class ProductsController : ControllerBase
         if (product == null)
             return NotFound();
 
-        return Ok(product);
+        var dto = new ProductDto
+        {
+            Id = product.Id,
+            Name = product.Name,
+            Price = product.Price,
+            CategoryId = product.CategoryId,
+            CategoryName = product.Category.Name
+        };
+
+        return Ok(dto);
     }
 
     [HttpPost]
