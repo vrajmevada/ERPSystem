@@ -52,4 +52,28 @@ public class CategoriesController : ControllerBase
             Name = category.Name
         });
     }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult>Update(
+        int id, [FromBody] UpdateCategoryDto dto)
+    {
+        var category = await _repository.GetByIdAsync(id);
+        if (category == null)
+            return NotFound();
+
+        category.Name = dto.Name;
+        await _repository.UpdateAsync(category);
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult>Delete(int id)
+    {
+        var category = await _repository.GetByIdAsync(id);
+        if (category == null)
+            return NotFound();
+
+        await _repository.DeleteAsync(category);
+        return NoContent();
+    }
 }
