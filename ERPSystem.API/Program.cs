@@ -1,13 +1,15 @@
 using ERPSystem.API.Exceptions;
+using ERPSystem.Application.Features.Catalog.Mapping;
 using ERPSystem.Application.Features.Catalog.Services;
 using ERPSystem.Application.Features.Catalog.Validators;
+using ERPSystem.Application.Features.People.Services;
 using ERPSystem.Application.Interfaces.Catalog;
+using ERPSystem.Application.Interfaces.People;
 using ERPSystem.Persistence.Context;
 using ERPSystem.Persistence.Repositories;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
-using ERPSystem.Application.Features.Catalog.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,6 +44,13 @@ ProductMappingConfig.Register();
 builder.Services.AddScoped<
     IProductService,
     ProductService>();
+builder.Services.AddScoped<
+    ICustomerRepository,
+    CustomerRepository>();
+
+builder.Services.AddScoped<
+    ICustomerService,
+    CustomerService>();
 var app = builder.Build();
 app.UseExceptionHandler();
 if (app.Environment.IsDevelopment())
