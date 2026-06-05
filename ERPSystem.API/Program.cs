@@ -2,8 +2,10 @@ using ERPSystem.API.Exceptions;
 using ERPSystem.Application.Features.Catalog.Mapping;
 using ERPSystem.Application.Features.Catalog.Services;
 using ERPSystem.Application.Features.Catalog.Validators;
+using ERPSystem.Application.Features.Inventory.Services;
 using ERPSystem.Application.Features.People.Services;
 using ERPSystem.Application.Interfaces.Catalog;
+using ERPSystem.Application.Interfaces.Inventory;
 using ERPSystem.Application.Interfaces.People;
 using ERPSystem.Persistence.Context;
 using ERPSystem.Persistence.Repositories;
@@ -51,6 +53,12 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     ICustomerService,
     CustomerService>();
+builder.Services.AddScoped<
+    IWarehouseRepository,
+    WarehouseRepository>();
+builder.Services.AddScoped<
+    IWarehouseService,
+    WarehouseService>();
 var app = builder.Build();
 app.UseExceptionHandler();
 if (app.Environment.IsDevelopment())
