@@ -40,4 +40,26 @@ public class CustomersController : ControllerBase
 
         return Ok(result);
     }
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(
+    int id,
+    UpdateCustomerDto dto)
+    {
+        var updated = await _service.UpdateAsync(id, dto);
+
+        if (!updated)
+            return NotFound();
+
+        return NoContent();
+    }
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var deleted = await _service.DeleteAsync(id);
+
+        if (!deleted)
+            return NotFound();
+
+        return NoContent();
+    }
 }

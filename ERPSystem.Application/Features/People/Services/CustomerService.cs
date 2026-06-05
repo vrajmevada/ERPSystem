@@ -39,4 +39,33 @@ public class CustomerService : ICustomerService
 
         return customer.Adapt<CustomerDto>();
     }
+    public async Task<bool> UpdateAsync(
+    int id,
+    UpdateCustomerDto dto)
+    {
+        var customer = await _repository.GetByIdAsync(id);
+
+        if (customer == null)
+            return false;
+
+        customer.Name = dto.Name;
+        customer.Email = dto.Email;
+        customer.PhoneNumber = dto.PhoneNumber;
+        customer.Address = dto.Address;
+
+        await _repository.UpdateAsync(customer);
+
+        return true;
+    }
+    public async Task<bool> DeleteAsync(int id)
+    {
+        var customer = await _repository.GetByIdAsync(id);
+
+        if (customer == null)
+            return false;
+
+        await _repository.DeleteAsync(customer);
+
+        return true;
+    }
 }
