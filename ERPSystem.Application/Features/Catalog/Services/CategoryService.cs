@@ -1,7 +1,7 @@
 ﻿using ERPSystem.Application.Features.Catalog.DTOs;
 using ERPSystem.Application.Interfaces.Catalog;
 using ERPSystem.Domain.Entities.Catalog;
-
+using Mapster;
 namespace ERPSystem.Application.Features.Catalog.Services;
 
 public class CategoryService : ICategoryService
@@ -15,11 +15,7 @@ public class CategoryService : ICategoryService
     public async Task<IEnumerable<CategoryDto>>GetAllAsync()
     {
         var categories = await _repository.GetAllAsync();
-        return categories.Select(c => new CategoryDto
-        {
-            Id = c.Id,
-            Name = c.Name,
-        });
+        return categories.Adapt<List<CategoryDto>>();
 
     }
     public async Task<CategoryDto?> GetByIdAsync(int id)
@@ -28,11 +24,7 @@ public class CategoryService : ICategoryService
         if (category == null)
             return null;
 
-        return new CategoryDto
-        {
-            Id = category.Id,
-            Name = category.Name
-        };
+        return category.Adapt<CategoryDto>();
     }
     public async Task<CategoryDto> CreateAsync(
         CreateCategoryDto dto)
@@ -42,11 +34,7 @@ public class CategoryService : ICategoryService
             Name = dto.Name,
         };
         await _repository.AddAsync(category);
-        return new CategoryDto
-        {
-            Id = category.Id,
-            Name = category.Name
-        };
+        return category.Adapt<CategoryDto>();
     }
     public async Task<bool> UpdateAsync(
         int id,

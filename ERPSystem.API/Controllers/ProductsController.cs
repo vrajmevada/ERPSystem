@@ -1,6 +1,5 @@
 ﻿using ERPSystem.Application.Features.Catalog.DTOs;
-using ERPSystem.Application.Interfaces.Catalog;
-using ERPSystem.Domain.Entities.Catalog;
+using ERPSystem.Application.Features.Catalog.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ERPSystem.API.Controllers;
@@ -9,63 +8,36 @@ namespace ERPSystem.API.Controllers;
 [Route("api/[controller]")]
 public class ProductsController : ControllerBase
 {
-    private readonly IProductRepository _repository;
+    private readonly IProductService _service;
 
-    public ProductsController(IProductRepository repository)
+    public ProductsController(IProductService service)
     {
-        _repository = repository;
+        _service = service;
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<ActionResult<IEnumerable<ProductDto>>> GetAll()
     {
-        var products = await _repository.GetAllAsync();
-
-        var result = products.Select(p => new ProductDto
-        {
-            Id = p.Id,
-            Name = p.Name,
-            Price = p.Price,
-            CategoryId = p.CategoryId,
-            CategoryName = p.Category.Name
-        });
-
-        return Ok(result);
+        return Ok(await _service.GetAllAsync());
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
+    public async Task<ActionResult<ProductDto>> GetById(int id)
     {
-        var product = await _repository.GetByIdAsync(id);
+        var product = await _service.GetByIdAsync(id);
 
         if (product == null)
             return NotFound();
 
-        var dto = new ProductDto
-        {
-            Id = product.Id,
-            Name = product.Name,
-            Price = product.Price,
-            CategoryId = product.CategoryId,
-            CategoryName = product.Category.Name
-        };
-
-        return Ok(dto);
+        return Ok(product);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(
+    public async Task<ActionResult<ProductDto>> Create(
         [FromBody] CreateProductDto dto)
     {
-        var product = new Product
-        {
-            Name = dto.Name,
-            Price = dto.Price,
-            CategoryId = dto.CategoryId
-        };
+        var result = await _service.CreateAsync(dto);
 
-        await _repository.AddAsync(product);
-
-        return Ok(product);
+        return Ok(result);
     }
 }

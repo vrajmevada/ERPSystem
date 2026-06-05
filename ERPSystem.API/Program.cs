@@ -7,6 +7,7 @@ using ERPSystem.Persistence.Repositories;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
+using ERPSystem.Application.Features.Catalog.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +38,10 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     IProductRepository,
     ProductRepository>();
+ProductMappingConfig.Register();
+builder.Services.AddScoped<
+    IProductService,
+    ProductService>();
 var app = builder.Build();
 app.UseExceptionHandler();
 if (app.Environment.IsDevelopment())
