@@ -13,6 +13,7 @@
   <ItemGroup>
     <Folder Include="Features\Catalog\Commands\" />
     <Folder Include="Features\Catalog\Queries\" />
+    <Folder Include="Features\People\Mapping\" />
   </ItemGroup>
 
   <ItemGroup>
