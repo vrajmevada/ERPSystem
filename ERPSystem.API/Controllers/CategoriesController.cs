@@ -2,6 +2,7 @@
 using ERPSystem.Domain.Entities.Catalog;
 using Microsoft.AspNetCore.Mvc;
 using ERPSystem.Application.Features.Catalog.DTOs;
+using ERPSystem.Application.Features.Catalog.Services;
 
 namespace ERPSystem.API.Controllers;
 
@@ -9,32 +10,23 @@ namespace ERPSystem.API.Controllers;
 [Route("api/[controller]")]
 public class CategoriesController : ControllerBase
 {
-    private readonly ICategoryRepository _repository;
+    private readonly ICategoryService _service;
 
-    public CategoriesController(ICategoryRepository repository)
+    public CategoriesController(ICategoryService service)
     {
-        _repository = repository;
+        _service = service;
     }
 
     [HttpGet]
-    [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var categories = await _repository.GetAllAsync();
-
-        var result = categories.Select(c => new CategoryDto
-        {
-            Id = c.Id,
-            Name = c.Name
-        });
-
-        return Ok(result);
+        return Ok(await _service.GetAllAsync());
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var category = await _repository.GetByIdAsync(id);
+        var category = await _service.GetByIdAsync(id);
 
         if (category == null)
             return NotFound();
@@ -52,41 +44,26 @@ public class CategoriesController : ControllerBase
     public async Task<IActionResult> Create(
     [FromBody] CreateCategoryDto dto)
     {
-        var category = new Category
-        {
-            Name = dto.Name
-        };
-
-        await _repository.AddAsync(category);
-
-        return Ok(new CategoryDto
-        {
-            Id = category.Id,
-            Name = category.Name
-        });
+        var result = await _service.CreateAsync(dto);
+        return Ok(result);
     }
 
     [HttpPut("{id}")]
     public async Task<IActionResult>Update(
         int id, [FromBody] UpdateCategoryDto dto)
     {
-        var category = await _repository.GetByIdAsync(id);
-        if (category == null)
+        var updated = await _service.UpdateAsync(id,dto);
+        if (!updated)
             return NotFound();
-
-        category.Name = dto.Name;
-        await _repository.UpdateAsync(category);
         return NoContent();
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult>Delete(int id)
     {
-        var category = await _repository.GetByIdAsync(id);
-        if (category == null)
+        var deleted = await _service.DeleteAsync(id);
+        if (!deleted)
             return NotFound();
-
-        await _repository.DeleteAsync(category);
         return NoContent();
     }
 }
