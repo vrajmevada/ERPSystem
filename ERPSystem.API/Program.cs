@@ -1,8 +1,10 @@
-using ERPSystem.Persistence.Context;
-using Microsoft.EntityFrameworkCore;
+using ERPSystem.Application.Features.Catalog.Validators;
 using ERPSystem.Application.Interfaces.Catalog;
+using ERPSystem.Persistence.Context;
 using ERPSystem.Persistence.Repositories;
-
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -13,6 +15,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddFluentValidationAutoValidation();
+
+builder.Services.AddValidatorsFromAssemblyContaining<
+    CreateCategoryDtoValidator>();
 
 builder.Services.AddScoped<
     ICategoryRepository,
