@@ -2,6 +2,7 @@ using ERPSystem.API.Exceptions;
 using ERPSystem.Application.Features.Catalog.Mapping;
 using ERPSystem.Application.Features.Catalog.Services;
 using ERPSystem.Application.Features.Catalog.Validators;
+using ERPSystem.Application.Features.Inventory.Mapping;
 using ERPSystem.Application.Features.Inventory.Services;
 using ERPSystem.Application.Features.People.Services;
 using ERPSystem.Application.Interfaces.Catalog;
@@ -43,13 +44,20 @@ builder.Services.AddScoped<
     IProductRepository,
     ProductRepository>();
 ProductMappingConfig.Register();
+StockItemMappingConfig.Register();
 builder.Services.AddScoped<
     IProductService,
     ProductService>();
 builder.Services.AddScoped<
     ICustomerRepository,
     CustomerRepository>();
+builder.Services.AddScoped<
+    IStockItemRepository,
+    StockItemRepository>();
 
+builder.Services.AddScoped<
+    IStockItemService,
+    StockItemService>();
 builder.Services.AddScoped<
     ICustomerService,
     CustomerService>();
