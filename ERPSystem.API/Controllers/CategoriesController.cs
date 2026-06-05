@@ -1,4 +1,4 @@
-﻿using ERPSystem.Application.Interfaces.Catalog;
+using ERPSystem.Application.Interfaces.Catalog;
 using ERPSystem.Domain.Entities.Catalog;
 using Microsoft.AspNetCore.Mvc;
 using ERPSystem.Application.Features.Catalog.DTOs;
@@ -18,30 +18,24 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<ActionResult<IEnumerable<CategoryDto>>> GetAll()
     {
         return Ok(await _service.GetAllAsync());
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
+    public async Task<ActionResult<CategoryDto>> GetById(int id)
     {
         var category = await _service.GetByIdAsync(id);
 
         if (category == null)
             return NotFound();
 
-        var dto = new CategoryDto
-        {
-            Id = category.Id,
-            Name = category.Name
-        };
-
-        return Ok(dto);
+        return Ok(category);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(
+    public async Task<ActionResult<CategoryDto>> Create(
     [FromBody] CreateCategoryDto dto)
     {
         var result = await _service.CreateAsync(dto);

@@ -1,4 +1,4 @@
-﻿using ERPSystem.Application.Features.Catalog.DTOs;
+using ERPSystem.Application.Features.Catalog.DTOs;
 using FluentValidation;
 namespace ERPSystem.Application.Features.Catalog.Validators;
 
@@ -8,7 +8,7 @@ public class CreateCategoryDtoValidator : AbstractValidator<CreateCategoryDto>
     {
         RuleFor(x => x.Name)
             .NotEmpty()
-            .WithMessage("Cateogory Name is required.")
+            .WithMessage("Category Name is required.")
             .MaximumLength(100)
             .WithMessage("Category name cannot exceed 100 characters.");
     }
