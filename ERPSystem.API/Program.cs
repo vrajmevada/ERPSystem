@@ -5,15 +5,17 @@ using ERPSystem.Application.Features.Catalog.Validators;
 using ERPSystem.Application.Features.Inventory.Mapping;
 using ERPSystem.Application.Features.Inventory.Services;
 using ERPSystem.Application.Features.People.Services;
+using ERPSystem.Application.Features.Purchasing.Services;
 using ERPSystem.Application.Interfaces.Catalog;
 using ERPSystem.Application.Interfaces.Inventory;
 using ERPSystem.Application.Interfaces.People;
+using ERPSystem.Application.Interfaces.Purchasing;
 using ERPSystem.Persistence.Context;
 using ERPSystem.Persistence.Repositories;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -88,6 +90,13 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     ISupplierService,
     SupplierService>();
+builder.Services.AddScoped<
+    IPurchaseOrderRepository,
+    PurchaseOrderRepository>();
+
+builder.Services.AddScoped<
+    IPurchaseOrderService,
+    PurchaseOrderService>();
 var app = builder.Build();
 app.UseExceptionHandler();
 if (app.Environment.IsDevelopment())
