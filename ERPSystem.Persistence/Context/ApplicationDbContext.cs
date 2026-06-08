@@ -19,7 +19,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Warehouse> Warehouses => Set<Warehouse>();
     public DbSet<StockItem> StockItems => Set<StockItem>();
     public DbSet<InventoryTransaction> InventoryTransactions => Set<InventoryTransaction>();
-
+    public DbSet<Supplier> Suppliers => Set<Supplier>();
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<InventoryTransaction>()

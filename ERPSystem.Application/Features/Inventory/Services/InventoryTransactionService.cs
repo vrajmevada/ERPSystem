@@ -49,7 +49,7 @@ public class InventoryTransactionService
                 dto.StockItemId);
 
         if (stockItem == null)
-            throw new Exception("Stock item not found.");
+            throw new BusinessException("Stock item not found.");
         if (stockItem.Quantity + dto.QuantityChange < 0)
         {
             throw new BusinessException("Insufficient stock.");
