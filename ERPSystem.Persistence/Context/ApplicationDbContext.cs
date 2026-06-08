@@ -17,4 +17,5 @@ public class ApplicationDbContext : DbContext
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<Warehouse> Warehouses => Set<Warehouse>();
     public DbSet<StockItem> StockItems => Set<StockItem>();
+    public DbSet<InventoryTransaction> InventoryTransactions => Set<InventoryTransaction>();
 }
