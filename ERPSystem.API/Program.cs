@@ -81,6 +81,13 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     IInventoryTransactionService,
     InventoryTransactionService>();
+builder.Services.AddScoped<
+    ISupplierRepository,
+    SupplierRepository>();
+
+builder.Services.AddScoped<
+    ISupplierService,
+    SupplierService>();
 var app = builder.Build();
 app.UseExceptionHandler();
 if (app.Environment.IsDevelopment())
