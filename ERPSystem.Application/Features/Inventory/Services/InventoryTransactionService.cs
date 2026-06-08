@@ -1,6 +1,7 @@
 ﻿using ERPSystem.Application.Features.Inventory.DTOs;
 using ERPSystem.Application.Interfaces.Inventory;
 using ERPSystem.Domain.Entities.Inventory;
+using ERPSystem.Application.Exceptions;
 using Mapster;
 
 namespace ERPSystem.Application.Features.Inventory.Services;
@@ -51,7 +52,7 @@ public class InventoryTransactionService
             throw new Exception("Stock item not found.");
         if (stockItem.Quantity + dto.QuantityChange < 0)
         {
-            throw new Exception("Insufficient stock.");
+            throw new BusinessException("Insufficient stock.");
         }
 
         stockItem.Quantity += dto.QuantityChange;
