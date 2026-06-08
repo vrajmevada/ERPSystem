@@ -43,4 +43,11 @@ public class PurchaseOrdersController : ControllerBase
 
         return Ok(result);
     }
+    [HttpPost("{id}/receive")]
+    public async Task<IActionResult> Receive(int id)
+    {
+        await _service.ReceiveAsync(id);
+
+        return NoContent();
+    }
 }

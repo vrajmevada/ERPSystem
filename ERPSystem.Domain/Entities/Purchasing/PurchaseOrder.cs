@@ -1,7 +1,6 @@
-﻿using ERPSystem.Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using ERPSystem.Domain.Entities.Inventory;
+using ERPSystem.Domain.Enums;
+using ERPSystem.Domain.Entities.People;
 
 namespace ERPSystem.Domain.Entities.Purchasing;
 
@@ -19,7 +18,8 @@ public class PurchaseOrder
     = PurchaseOrderStatus.Draft;
 
     public Supplier Supplier { get; set; } = null!;
-
+    public int WarehouseId { get; set; }
+    public Warehouse Warehouse { get; set; }=null!;
     public ICollection<PurchaseOrderItem> Items
     { get; set; } = new List<PurchaseOrderItem>();
 }

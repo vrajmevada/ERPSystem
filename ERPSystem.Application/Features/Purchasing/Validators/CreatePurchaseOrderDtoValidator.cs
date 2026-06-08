@@ -14,6 +14,9 @@ public class CreatePurchaseOrderDtoValidator
         RuleFor(x => x.Items)
             .NotEmpty();
 
+        RuleFor(x => x.WarehouseId)
+            .GreaterThan(0);
+
         RuleForEach(x => x.Items)
             .SetValidator(
                 new CreatePurchaseOrderItemDtoValidator());

@@ -15,5 +15,7 @@ public class StockItem
     public Product Product { get; set; } = null!;
 
     public Warehouse Warehouse { get; set; } = null!;
-    public ICollection<InventoryTransaction> Transactions { get; set; } = new List<InventoryTransaction>();
+
+    public ICollection<InventoryTransaction> Transactions
+    { get; set; } = new List<InventoryTransaction>();
 }
