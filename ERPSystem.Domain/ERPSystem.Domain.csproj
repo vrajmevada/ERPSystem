@@ -10,7 +10,6 @@
     <Folder Include="Common\" />
     <Folder Include="Entities\Identity\" />
     <Folder Include="Entities\Sales\" />
-    <Folder Include="Enums\" />
   </ItemGroup>
 
 </Project>

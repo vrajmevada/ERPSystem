@@ -12,8 +12,7 @@ public class CreateInventoryTransactionDtoValidator
             .GreaterThan(0);
 
         RuleFor(x => x.TransactionType)
-            .NotEmpty()
-            .MaximumLength(50);
+            .IsInEnum();
 
         RuleFor(x => x.QuantityChange)
             .NotEqual(0);

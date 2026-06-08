@@ -1,8 +1,9 @@
 ﻿namespace ERPSystem.Application.Features.Inventory.DTOs;
 
+using ERPSystem.Domain.Enums;
 public record InventoryTransactionDto(
     int Id,
     int StockItemId,
     int QuantityChange,
-    string TransactionType,
+    InventoryTransactionType TransactionType,
     DateTime TransactionDate);

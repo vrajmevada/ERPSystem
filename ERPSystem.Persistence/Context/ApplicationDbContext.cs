@@ -8,14 +8,24 @@ namespace ERPSystem.Persistence.Context;
 public class ApplicationDbContext : DbContext
 {
     public ApplicationDbContext(
-        DbContextOptions<ApplicationDbContext>options)
-        :base(options)
+        DbContextOptions<ApplicationDbContext> options)
+        : base(options)
     {
     }
+
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Product> Products => Set<Product>();
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<Warehouse> Warehouses => Set<Warehouse>();
     public DbSet<StockItem> StockItems => Set<StockItem>();
     public DbSet<InventoryTransaction> InventoryTransactions => Set<InventoryTransaction>();
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<InventoryTransaction>()
+            .Property(x => x.TransactionType)
+            .HasConversion<string>();
+
+        base.OnModelCreating(modelBuilder);
+    }
 }
