@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace ERPSystem.Application.Features.Inventory.DTOs;
 
-namespace ERPSystem.Application.Features.Inventory.DTOs
-{
-    internal class InventoryTransactionDto
-    {
-    }
-}
+public record InventoryTransactionDto(
+    int Id,
+    int StockItemId,
+    int QuantityChange,
+    string TransactionType,
+    DateTime TransactionDate);
