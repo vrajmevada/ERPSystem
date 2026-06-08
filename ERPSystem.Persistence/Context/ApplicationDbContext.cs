@@ -1,6 +1,7 @@
 ﻿using ERPSystem.Domain.Entities.Catalog;
-using ERPSystem.Domain.Entities.People;
 using ERPSystem.Domain.Entities.Inventory;
+using ERPSystem.Domain.Entities.People;
+using ERPSystem.Domain.Entities.Purchasing;
 using Microsoft.EntityFrameworkCore;
 
 namespace ERPSystem.Persistence.Context;
@@ -20,6 +21,11 @@ public class ApplicationDbContext : DbContext
     public DbSet<StockItem> StockItems => Set<StockItem>();
     public DbSet<InventoryTransaction> InventoryTransactions => Set<InventoryTransaction>();
     public DbSet<Supplier> Suppliers => Set<Supplier>();
+    public DbSet<PurchaseOrder> PurchaseOrders
+     => Set<PurchaseOrder>();
+
+    public DbSet<PurchaseOrderItem> PurchaseOrderItems
+        => Set<PurchaseOrderItem>();
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<InventoryTransaction>()
