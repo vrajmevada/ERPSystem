@@ -2,12 +2,14 @@ using ERPSystem.API.Exceptions;
 using ERPSystem.Application.Features.Catalog.Mapping;
 using ERPSystem.Application.Features.Catalog.Services;
 using ERPSystem.Application.Features.Catalog.Validators;
+using ERPSystem.Application.Features.Dashboard.Services;
 using ERPSystem.Application.Features.Inventory.Mapping;
 using ERPSystem.Application.Features.Inventory.Services;
 using ERPSystem.Application.Features.People.Services;
 using ERPSystem.Application.Features.Purchasing.Services;
 using ERPSystem.Application.Features.Sales.Services;
 using ERPSystem.Application.Interfaces.Catalog;
+using ERPSystem.Application.Interfaces.Dashboard;
 using ERPSystem.Application.Interfaces.Inventory;
 using ERPSystem.Application.Interfaces.People;
 using ERPSystem.Application.Interfaces.Purchasing;
@@ -106,6 +108,16 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     ISalesOrderService,
     SalesOrderService>();
+builder.Services.AddScoped<
+    IDashboardService,
+    DashboardService>();
+builder.Services.AddScoped<
+    IDashboardRepository,
+    DashboardRepository>();
+
+builder.Services.AddScoped<
+    IDashboardService,
+    DashboardService>();
 var app = builder.Build();
 app.UseExceptionHandler();
 if (app.Environment.IsDevelopment())
