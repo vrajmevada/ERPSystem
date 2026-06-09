@@ -1,4 +1,5 @@
 using ERPSystem.API.Exceptions;
+using Microsoft.OpenApi;
 using ERPSystem.Application.Features.Catalog.Mapping;
 using ERPSystem.Application.Features.Catalog.Services;
 using ERPSystem.Application.Features.Catalog.Validators;
@@ -22,18 +23,35 @@ using ERPSystem.Persistence.Repositories;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
-using ERPSystem.Application.Security;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+
 using System.Text;
 using System.Text.Json.Serialization;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter 'Bearer' [space] and then your valid token in the text input below.\r\n\r\nExample: \"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\""
+    });
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    {
+        [new OpenApiSecuritySchemeReference("Bearer", document)] = new List<string>()
+    });
+});
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 builder.Services.AddProblemDetails();
@@ -122,9 +140,6 @@ builder.Services.AddScoped<
     IDashboardRepository,
     DashboardRepository>();
 
-builder.Services.AddScoped<
-    IDashboardService,
-    DashboardService>();
 builder.Services.Configure<JwtSettings>(
     builder.Configuration.GetSection(
         "JwtSettings"));
@@ -176,8 +191,6 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseHttpsRedirection();
-
-app.UseAuthorization();
 
 app.MapControllers();
 Console.WriteLine(
