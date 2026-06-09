@@ -1,11 +1,15 @@
-﻿using ERPSystem.Application.Features.People.DTOs;
+using ERPSystem.Application.Features.People.DTOs;
 using ERPSystem.Application.Features.People.Services;
 using Microsoft.AspNetCore.Mvc;
+
+using Microsoft.AspNetCore.Authorization;
+using ERPSystem.Application.Security;
 
 namespace ERPSystem.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class CustomersController : ControllerBase
 {
     private readonly ICustomerService _service;
@@ -33,6 +37,7 @@ public class CustomersController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = AppPolicies.MasterDataWrite)]
     public async Task<ActionResult<CustomerDto>> Create(
         [FromBody] CreateCustomerDto dto)
     {
@@ -41,6 +46,7 @@ public class CustomersController : ControllerBase
         return Ok(result);
     }
     [HttpPut("{id}")]
+    [Authorize(Policy = AppPolicies.MasterDataWrite)]
     public async Task<IActionResult> Update(
     int id,
     UpdateCustomerDto dto)
@@ -53,6 +59,7 @@ public class CustomersController : ControllerBase
         return NoContent();
     }
     [HttpDelete("{id}")]
+    [Authorize(Policy = AppPolicies.MasterDataWrite)]
     public async Task<IActionResult> Delete(int id)
     {
         var deleted = await _service.DeleteAsync(id);

@@ -1,11 +1,15 @@
-﻿using ERPSystem.Application.Features.Inventory.DTOs;
+using ERPSystem.Application.Features.Inventory.DTOs;
 using ERPSystem.Application.Features.Inventory.Services;
 using Microsoft.AspNetCore.Mvc;
+
+using Microsoft.AspNetCore.Authorization;
+using ERPSystem.Application.Security;
 
 namespace ERPSystem.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class InventoryTransactionsController : ControllerBase
 {
     private readonly IInventoryTransactionService _service;
@@ -37,6 +41,7 @@ public class InventoryTransactionsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = AppPolicies.OrderOperate)]
     public async Task<ActionResult<InventoryTransactionDto>>
         Create(CreateInventoryTransactionDto dto)
     {

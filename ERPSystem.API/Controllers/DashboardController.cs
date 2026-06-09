@@ -1,9 +1,11 @@
 ﻿using ERPSystem.Application.Features.Dashboard.DTOs;
 using ERPSystem.Application.Features.Dashboard.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ERPSystem.API.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class DashboardController : ControllerBase

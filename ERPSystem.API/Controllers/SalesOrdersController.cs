@@ -1,11 +1,15 @@
-﻿using ERPSystem.Application.Features.Sales.DTOs;
+using ERPSystem.Application.Features.Sales.DTOs;
 using ERPSystem.Application.Features.Sales.Services;
 using Microsoft.AspNetCore.Mvc;
+
+using Microsoft.AspNetCore.Authorization;
+using ERPSystem.Application.Security;
 
 namespace ERPSystem.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class SalesOrdersController : ControllerBase
 {
     private readonly ISalesOrderService _service;
@@ -36,6 +40,7 @@ public class SalesOrdersController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = AppPolicies.OrderOperate)]
     public async Task<ActionResult<SalesOrderDto>>
         Create(CreateSalesOrderDto dto)
     {
@@ -45,6 +50,7 @@ public class SalesOrdersController : ControllerBase
     }
 
     [HttpPost("{id}/ship")]
+    [Authorize(Policy = AppPolicies.OrderOperate)]
     public async Task<IActionResult> Ship(int id)
     {
         await _service.ShipAsync(id);
@@ -52,6 +58,7 @@ public class SalesOrdersController : ControllerBase
         return NoContent();
     }
     [HttpPost("{id}/confirm")]
+    [Authorize(Policy = AppPolicies.OrderOperate)]
     public async Task<IActionResult> Confirm(int id)
     {
         await _service.ConfirmAsync(id);

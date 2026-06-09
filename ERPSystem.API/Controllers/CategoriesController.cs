@@ -1,13 +1,14 @@
-using ERPSystem.Application.Interfaces.Catalog;
-using ERPSystem.Domain.Entities.Catalog;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using ERPSystem.Application.Security;
 using ERPSystem.Application.Features.Catalog.DTOs;
 using ERPSystem.Application.Features.Catalog.Services;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ERPSystem.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class CategoriesController : ControllerBase
 {
     private readonly ICategoryService _service;
@@ -35,6 +36,7 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = AppPolicies.MasterDataWrite)]
     public async Task<ActionResult<CategoryDto>> Create(
     [FromBody] CreateCategoryDto dto)
     {
@@ -43,6 +45,7 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Policy = AppPolicies.MasterDataWrite)]
     public async Task<IActionResult>Update(
         int id, [FromBody] UpdateCategoryDto dto)
     {
@@ -53,6 +56,7 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Policy = AppPolicies.MasterDataWrite)]
     public async Task<IActionResult>Delete(int id)
     {
         var deleted = await _service.DeleteAsync(id);

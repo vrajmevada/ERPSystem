@@ -1,11 +1,15 @@
-﻿using ERPSystem.Application.Features.Catalog.DTOs;
+using ERPSystem.Application.Features.Catalog.DTOs;
 using ERPSystem.Application.Features.Catalog.Services;
 using Microsoft.AspNetCore.Mvc;
+
+using Microsoft.AspNetCore.Authorization;
+using ERPSystem.Application.Security;
 
 namespace ERPSystem.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class ProductsController : ControllerBase
 {
     private readonly IProductService _service;
@@ -33,6 +37,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = AppPolicies.MasterDataWrite)]
     public async Task<ActionResult<ProductDto>> Create(
         [FromBody] CreateProductDto dto)
     {

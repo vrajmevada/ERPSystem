@@ -1,11 +1,15 @@
-﻿using ERPSystem.Application.Features.Purchasing.DTOs;
+using ERPSystem.Application.Features.Purchasing.DTOs;
 using ERPSystem.Application.Features.Purchasing.Services;
 using Microsoft.AspNetCore.Mvc;
+
+using Microsoft.AspNetCore.Authorization;
+using ERPSystem.Application.Security;
 
 namespace ERPSystem.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class PurchaseOrdersController : ControllerBase
 {
     private readonly IPurchaseOrderService _service;
@@ -36,6 +40,7 @@ public class PurchaseOrdersController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = AppPolicies.OrderOperate)]
     public async Task<ActionResult<PurchaseOrderDto>>
         Create(CreatePurchaseOrderDto dto)
     {
@@ -44,6 +49,7 @@ public class PurchaseOrdersController : ControllerBase
         return Ok(result);
     }
     [HttpPost("{id}/receive")]
+    [Authorize(Policy = AppPolicies.OrderOperate)]
     public async Task<IActionResult> Receive(int id)
     {
         await _service.ReceiveAsync(id);
@@ -51,6 +57,7 @@ public class PurchaseOrdersController : ControllerBase
         return NoContent();
     }
     [HttpPost("{id}/approve")]
+    [Authorize(Policy = AppPolicies.OrderApprove)]
     public async Task<IActionResult> Approve(int id)
     {
         await _service.ApproveAsync(id);

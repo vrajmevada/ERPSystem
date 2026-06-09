@@ -1,5 +1,6 @@
 using ERPSystem.API.Exceptions;
 using Microsoft.OpenApi;
+using ERPSystem.Domain.Entities.Identity;
 using ERPSystem.Application.Features.Catalog.Mapping;
 using ERPSystem.Application.Features.Catalog.Services;
 using ERPSystem.Application.Features.Catalog.Validators;
@@ -181,6 +182,19 @@ builder.Services
                             jwtSettings.Key))
             };
     });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(AppPolicies.MasterDataWrite, policy =>
+        policy.RequireRole(AppRoles.Admin, AppRoles.Manager));
+
+    options.AddPolicy(AppPolicies.OrderApprove, policy =>
+        policy.RequireRole(AppRoles.Admin, AppRoles.Manager));
+
+    options.AddPolicy(AppPolicies.OrderOperate, policy =>
+        policy.RequireRole(AppRoles.Admin, AppRoles.Manager, AppRoles.Operator));
+});
+
 var app = builder.Build();
 app.UseExceptionHandler();
 if (app.Environment.IsDevelopment())

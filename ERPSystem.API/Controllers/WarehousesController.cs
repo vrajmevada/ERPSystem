@@ -1,11 +1,15 @@
-﻿using ERPSystem.Application.Features.Inventory.DTOs;
+using ERPSystem.Application.Features.Inventory.DTOs;
 using ERPSystem.Application.Features.Inventory.Services;
 using Microsoft.AspNetCore.Mvc;
+
+using Microsoft.AspNetCore.Authorization;
+using ERPSystem.Application.Security;
 
 namespace ERPSystem.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class WarehousesController : ControllerBase
 {
     private readonly IWarehouseService _service;
@@ -33,6 +37,7 @@ public class WarehousesController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = AppPolicies.MasterDataWrite)]
     public async Task<ActionResult<WarehouseDto>> Create(
         CreateWarehouseDto dto)
     {
@@ -42,6 +47,7 @@ public class WarehousesController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Policy = AppPolicies.MasterDataWrite)]
     public async Task<IActionResult> Update(
         int id,
         UpdateWarehouseDto dto)
@@ -55,6 +61,7 @@ public class WarehousesController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Policy = AppPolicies.MasterDataWrite)]
     public async Task<IActionResult> Delete(int id)
     {
         var deleted = await _service.DeleteAsync(id);
