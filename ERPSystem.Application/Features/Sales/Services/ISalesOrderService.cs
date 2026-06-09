@@ -14,4 +14,5 @@ public interface ISalesOrderService
         CreateAsync(CreateSalesOrderDto dto);
 
     Task ShipAsync(int id);
+    Task ConfirmAsync(int id);
 }

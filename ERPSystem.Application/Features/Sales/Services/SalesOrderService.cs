@@ -103,6 +103,11 @@ public class SalesOrderService
             stockItem.Quantity -= item.Quantity;
 
             await _stockItemRepository.UpdateAsync(stockItem);
+            if (order.Status != SalesOrderStatus.Confirmed)
+            {
+                throw new BusinessException(
+                    "Sales order must be confirmed before shipping.");
+            }
 
             await _transactionRepository.AddAsync(
                 new InventoryTransaction
@@ -113,9 +118,20 @@ public class SalesOrderService
                     TransactionDate = DateTime.UtcNow
                 });
         }
+        
 
         order.Status = SalesOrderStatus.Shipped;
 
+        await _repository.UpdateAsync(order);
+    }
+    public async Task ConfirmAsync(int id)
+    {
+        var order = await _repository.GetByIdAsync(id);
+        if (order == null)
+            throw new BusinessException("Sales order not found.");
+        if (order.Status != SalesOrderStatus.Draft)
+            throw new BusinessException("Only draft sales orders can be confirmed.");
+        order.Status = SalesOrderStatus.Confirmed;
         await _repository.UpdateAsync(order);
     }
 }

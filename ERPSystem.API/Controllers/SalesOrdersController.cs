@@ -51,4 +51,11 @@ public class SalesOrdersController : ControllerBase
 
         return NoContent();
     }
+    [HttpPost("{id}/confirm")]
+    public async Task<IActionResult> Confirm(int id)
+    {
+        await _service.ConfirmAsync(id);
+
+        return NoContent();
+    }
 }
