@@ -6,10 +6,12 @@ using ERPSystem.Application.Features.Inventory.Mapping;
 using ERPSystem.Application.Features.Inventory.Services;
 using ERPSystem.Application.Features.People.Services;
 using ERPSystem.Application.Features.Purchasing.Services;
+using ERPSystem.Application.Features.Sales.Services;
 using ERPSystem.Application.Interfaces.Catalog;
 using ERPSystem.Application.Interfaces.Inventory;
 using ERPSystem.Application.Interfaces.People;
 using ERPSystem.Application.Interfaces.Purchasing;
+using ERPSystem.Application.Interfaces.Sales;
 using ERPSystem.Persistence.Context;
 using ERPSystem.Persistence.Repositories;
 using FluentValidation;
@@ -97,6 +99,13 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     IPurchaseOrderService,
     PurchaseOrderService>();
+builder.Services.AddScoped<
+    ISalesOrderRepository,
+    SalesOrderRepository>();
+
+builder.Services.AddScoped<
+    ISalesOrderService,
+    SalesOrderService>();
 var app = builder.Build();
 app.UseExceptionHandler();
 if (app.Environment.IsDevelopment())
