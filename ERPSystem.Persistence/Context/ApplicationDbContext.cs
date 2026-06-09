@@ -2,6 +2,7 @@
 using ERPSystem.Domain.Entities.Inventory;
 using ERPSystem.Domain.Entities.People;
 using ERPSystem.Domain.Entities.Purchasing;
+using ERPSystem.Domain.Entities.Sales;
 using Microsoft.EntityFrameworkCore;
 
 namespace ERPSystem.Persistence.Context;
@@ -26,6 +27,8 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<PurchaseOrderItem> PurchaseOrderItems
         => Set<PurchaseOrderItem>();
+    public DbSet<SalesOrder> SalesOrders => Set<SalesOrder>();
+    public DbSet<SalesOrderItem> SalesOrderItems => Set<SalesOrderItem>();
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<InventoryTransaction>()
