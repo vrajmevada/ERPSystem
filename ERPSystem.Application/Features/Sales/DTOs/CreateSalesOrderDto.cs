@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace ERPSystem.Application.Features.Sales.DTOs;
 
-namespace ERPSystem.Application.Features.Sales.DTOs
-{
-    internal class CreateSalesOrderDto
-    {
-    }
-}
+public record CreateSalesOrderDto(
+    int CustomerId,
+    int WarehouseId,
+    List<CreateSalesOrderItemDto> Items);

@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace ERPSystem.Application.Features.Sales.DTOs;
 
-namespace ERPSystem.Application.Features.Sales.DTOs
-{
-    internal class SalesOrderItemDto
-    {
-    }
-}
+public record SalesOrderItemDto(
+    int ProductId,
+    string ProductName,
+    int Quantity,
+    decimal UnitPrice);
