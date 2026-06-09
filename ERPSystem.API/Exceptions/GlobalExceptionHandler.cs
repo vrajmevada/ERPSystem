@@ -25,7 +25,7 @@ public class GlobalExceptionHandler : IExceptionHandler
         {
             Status = statusCode,
             Title = title,
-            Detail = exception.Message
+            Detail = exception is BusinessException ? exception.Message : "An unexpected error occurred."
         };
 
         httpContext.Response.StatusCode = statusCode;

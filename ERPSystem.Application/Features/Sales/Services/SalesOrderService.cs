@@ -99,15 +99,16 @@ public class SalesOrderService
             if (stockItem.Quantity < item.Quantity)
                 throw new BusinessException(
                     $"Insufficient stock for product {item.ProductId}.");
-
-            stockItem.Quantity -= item.Quantity;
-
-            await _stockItemRepository.UpdateAsync(stockItem);
             if (order.Status != SalesOrderStatus.Confirmed)
             {
                 throw new BusinessException(
                     "Sales order must be confirmed before shipping.");
             }
+
+            stockItem.Quantity -= item.Quantity;
+
+            await _stockItemRepository.UpdateAsync(stockItem);
+            
 
             await _transactionRepository.AddAsync(
                 new InventoryTransaction
