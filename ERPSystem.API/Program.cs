@@ -3,6 +3,7 @@ using ERPSystem.Application.Features.Catalog.Mapping;
 using ERPSystem.Application.Features.Catalog.Services;
 using ERPSystem.Application.Features.Catalog.Validators;
 using ERPSystem.Application.Features.Dashboard.Services;
+using ERPSystem.Application.Features.Identity.Services;
 using ERPSystem.Application.Features.Inventory.Mapping;
 using ERPSystem.Application.Features.Inventory.Services;
 using ERPSystem.Application.Features.People.Services;
@@ -10,15 +11,21 @@ using ERPSystem.Application.Features.Purchasing.Services;
 using ERPSystem.Application.Features.Sales.Services;
 using ERPSystem.Application.Interfaces.Catalog;
 using ERPSystem.Application.Interfaces.Dashboard;
+using ERPSystem.Application.Interfaces.Identity;
 using ERPSystem.Application.Interfaces.Inventory;
 using ERPSystem.Application.Interfaces.People;
 using ERPSystem.Application.Interfaces.Purchasing;
 using ERPSystem.Application.Interfaces.Sales;
+using ERPSystem.Application.Security;
 using ERPSystem.Persistence.Context;
 using ERPSystem.Persistence.Repositories;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
+using ERPSystem.Application.Security;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -118,6 +125,47 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     IDashboardService,
     DashboardService>();
+builder.Services.Configure<JwtSettings>(
+    builder.Configuration.GetSection(
+        "JwtSettings"));
+
+builder.Services.AddScoped<
+    IUserRepository,
+    UserRepository>();
+
+builder.Services.AddScoped<
+    IAuthService,
+    AuthService>();
+var jwtSettings =
+    builder.Configuration
+        .GetSection("JwtSettings")
+        .Get<JwtSettings>();
+
+builder.Services
+    .AddAuthentication(
+        JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters =
+            new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+
+                ValidIssuer =
+                    jwtSettings!.Issuer,
+
+                ValidAudience =
+                    jwtSettings.Audience,
+
+                IssuerSigningKey =
+                    new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(
+                            jwtSettings.Key))
+            };
+    });
 var app = builder.Build();
 app.UseExceptionHandler();
 if (app.Environment.IsDevelopment())
@@ -125,6 +173,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();

@@ -2,7 +2,7 @@
 
 namespace ERPSystem.Application.Security;
 
-public static class Passwordhasher
+public static class PasswordHasher
 {
     public static string Hash(
         string password)
