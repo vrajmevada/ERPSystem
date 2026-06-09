@@ -2,6 +2,9 @@
 using ERPSystem.Application.Interfaces.Sales;
 using ERPSystem.Domain.Entities.Sales;
 using ERPSystem.Domain.Enums;
+using ERPSystem.Application.Interfaces.Inventory;
+using ERPSystem.Application.Exceptions;
+using ERPSystem.Domain.Entities.Inventory;
 using Mapster;
 
 namespace ERPSystem.Application.Features.Sales.Services;
@@ -11,11 +14,17 @@ public class SalesOrderService
 {
     private readonly ISalesOrderRepository
         _repository;
+    private readonly IStockItemRepository _stockItemRepository;
+    private readonly IInventoryTransactionRepository _transactionRepository;
 
     public SalesOrderService(
-        ISalesOrderRepository repository)
+    ISalesOrderRepository repository,
+    IStockItemRepository stockItemRepository,
+    IInventoryTransactionRepository transactionRepository)
     {
         _repository = repository;
+        _stockItemRepository = stockItemRepository;
+        _transactionRepository = transactionRepository;
     }
 
     public async Task<IEnumerable<SalesOrderDto>>
@@ -64,8 +73,49 @@ public class SalesOrderService
         return order.Adapt<SalesOrderDto>();
     }
 
-    public Task ShipAsync(int id)
+    public async Task ShipAsync(int id)
     {
-        throw new NotImplementedException();
+        var order = await _repository.GetByIdAsync(id);
+
+        if (order == null)
+            throw new BusinessException("Sales order not found.");
+
+        if (order.Status == SalesOrderStatus.Shipped)
+            throw new BusinessException(
+                "Sales order already shipped.");
+
+        var stockItems = await _stockItemRepository.GetAllAsync();
+
+        foreach (var item in order.Items)
+        {
+            var stockItem = stockItems.FirstOrDefault(s =>
+                s.ProductId == item.ProductId &&
+                s.WarehouseId == order.WarehouseId);
+
+            if (stockItem == null)
+                throw new BusinessException(
+                    $"No stock found for product {item.ProductId}.");
+
+            if (stockItem.Quantity < item.Quantity)
+                throw new BusinessException(
+                    $"Insufficient stock for product {item.ProductId}.");
+
+            stockItem.Quantity -= item.Quantity;
+
+            await _stockItemRepository.UpdateAsync(stockItem);
+
+            await _transactionRepository.AddAsync(
+                new InventoryTransaction
+                {
+                    StockItemId = stockItem.Id,
+                    QuantityChange = -item.Quantity,
+                    TransactionType = InventoryTransactionType.Sale,
+                    TransactionDate = DateTime.UtcNow
+                });
+        }
+
+        order.Status = SalesOrderStatus.Shipped;
+
+        await _repository.UpdateAsync(order);
     }
 }
