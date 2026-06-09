@@ -13,5 +13,6 @@ public interface IPurchaseOrderService
     Task<PurchaseOrderDto>
         CreateAsync(CreatePurchaseOrderDto dto);
     Task ReceiveAsync(int id);
+    Task ApproveAsync(int id);
 
 }

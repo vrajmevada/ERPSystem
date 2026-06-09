@@ -50,4 +50,11 @@ public class PurchaseOrdersController : ControllerBase
 
         return NoContent();
     }
+    [HttpPost("{id}/approve")]
+    public async Task<IActionResult> Approve(int id)
+    {
+        await _service.ApproveAsync(id);
+
+        return NoContent();
+    }
 }

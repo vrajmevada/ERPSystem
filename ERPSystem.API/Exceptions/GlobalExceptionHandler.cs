@@ -25,7 +25,7 @@ public class GlobalExceptionHandler : IExceptionHandler
         {
             Status = statusCode,
             Title = title,
-            Detail = exception.ToString()
+            Detail = exception.Message
         };
 
         httpContext.Response.StatusCode = statusCode;

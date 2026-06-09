@@ -55,6 +55,11 @@ public class PurchaseOrderService
 
         if (order.Status == PurchaseOrderStatus.Received)
             throw new BusinessException("Purchase order already received.");
+        if (order.Status != PurchaseOrderStatus.Approved)
+        {
+            throw new BusinessException(
+                "Purchase order must be approved before receiving.");
+        }
 
         var stockItems = await _stockItemRepository.GetAllAsync();
 
@@ -95,6 +100,17 @@ public class PurchaseOrderService
         order.Status = PurchaseOrderStatus.Received;
 
         await _repository.UpdateAsync(order);
+    }
+    public async Task ApproveAsync(int id)
+    {
+        var order = await _repository.GetByIdAsync(id);
+        if (order == null)
+            throw new BusinessException("Purchase order not found.");
+        if (order.Status != PurchaseOrderStatus.Draft)
+            throw new BusinessException("Only draft purchase orders can be approved.");
+        order.Status = PurchaseOrderStatus.Approved;
+        await _repository.UpdateAsync(order);
+
     }
 
     public async Task<PurchaseOrderDto>
