@@ -20,4 +20,10 @@ public class ReportService : IReportService
         return await _repository
             .GetLowStockItemsAsync();
     }
+    public async Task<InventorySummaryDto>
+    GetInventorySummaryAsync()
+    {
+        return await _repository
+            .GetInventorySummaryAsync();
+    }
 }

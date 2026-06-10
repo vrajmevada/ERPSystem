@@ -26,4 +26,13 @@ public class ReportsController : ControllerBase
         return Ok(
             await _service.GetLowStockItemsAsync());
     }
+    [HttpGet("inventory-summary")]
+    public async Task<
+    ActionResult<InventorySummaryDto>>
+    GetInventorySummary()
+    {
+        return Ok(
+            await _service
+                .GetInventorySummaryAsync());
+    }
 }

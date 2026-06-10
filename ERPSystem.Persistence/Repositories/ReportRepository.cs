@@ -31,4 +31,23 @@ public class ReportRepository
                     s.Quantity))
             .ToListAsync();
     }
+    public async Task<InventorySummaryDto>
+    GetInventorySummaryAsync()
+    {
+        var totalStockItems =
+            await _context.StockItems.CountAsync();
+
+        var totalQuantity =
+            await _context.StockItems
+                .SumAsync(s => s.Quantity);
+
+        var lowStockItems =
+            await _context.StockItems
+                .CountAsync(s => s.Quantity < 10);
+
+        return new InventorySummaryDto(
+            totalStockItems,
+            totalQuantity,
+            lowStockItems);
+    }
 }

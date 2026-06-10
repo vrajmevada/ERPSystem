@@ -6,4 +6,6 @@ public interface IReportRepository
 {
     Task<List<LowStockReportDto>>
         GetLowStockItemsAsync();
+    Task<InventorySummaryDto>
+    GetInventorySummaryAsync();
 }
