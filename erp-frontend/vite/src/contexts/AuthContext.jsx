@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { createContext, useMemo, useState, useEffect } from 'react';
+import { createContext, useMemo } from 'react';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { login as loginApi } from 'api/auth';
 
@@ -17,33 +17,27 @@ function decodeToken(token) {
         .join('')
     );
     return JSON.parse(jsonPayload);
-  } catch (e) {
+  } catch {
     return null;
   }
 }
 
 export function AuthProvider({ children }) {
   const { state: token, setState: setToken, resetState: resetToken } = useLocalStorage('token', null);
-  const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    if (token) {
-      const decoded = decodeToken(token);
-      if (decoded) {
-        const username = decoded['unique_name'] || decoded['name'] || decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] || '';
-        const role = decoded['role'] || decoded['http://schemas.xmlsoap.org/ws/2008/06/identity/claims/role'] || '';
-        setUser({ username, role });
-      } else {
-        setUser(null);
-      }
-    } else {
-      setUser(null);
-    }
+  const user = useMemo(() => {
+    if (!token) return null;
+    const decoded = decodeToken(token);
+    if (!decoded) return null;
+    const username = decoded['unique_name'] || decoded['name'] || decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] || '';
+    const role = decoded['role'] || decoded['http://schemas.xmlsoap.org/ws/2008/06/identity/claims/role'] || '';
+    return { username, role };
   }, [token]);
 
   const login = async (username, password) => {
     const data = await loginApi(username, password);
     if (data && data.token) {
+      localStorage.setItem('token', JSON.stringify(data.token));
       setToken(data.token);
       return data;
     } else {
@@ -52,8 +46,8 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
+    localStorage.removeItem('token');
     resetToken();
-    setUser(null);
   };
 
   const isLoggedIn = Boolean(token && user);

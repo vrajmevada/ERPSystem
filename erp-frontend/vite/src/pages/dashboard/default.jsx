@@ -1,5 +1,11 @@
 import { useState } from 'react';
-
+import { useEffect } from 'react';
+import {
+  getSalesSummary,
+  getPurchaseSummary,
+  getInventorySummary
+} from 'api/dashboard';
+import Alert from '@mui/material/Alert';
 // material-ui
 import Avatar from '@mui/material/Avatar';
 import AvatarGroup from '@mui/material/AvatarGroup';
@@ -57,6 +63,30 @@ const actionSX = {
 // ==============================|| DASHBOARD - DEFAULT ||============================== //
 
 export default function DashboardDefault() {
+  const [salesSummary, setSalesSummary] = useState(null);
+  const [purchaseSummary, setPurchaseSummary] = useState(null);
+  const [inventorySummary, setInventorySummary] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const loadDashboard = async () => {
+      try {
+        setError(null);
+        const sales = await getSalesSummary();
+        const purchases = await getPurchaseSummary();
+        const inventory = await getInventorySummary();
+
+        setSalesSummary(sales);
+        setPurchaseSummary(purchases);
+        setInventorySummary(inventory);
+      } catch (err) {
+        console.error(err);
+        setError(err.response?.data?.message || err.message || 'Failed to load dashboard data');
+      }
+    };
+
+    loadDashboard();
+  }, []);
   const [orderMenuAnchor, setOrderMenuAnchor] = useState(null);
   const [analyticsMenuAnchor, setAnalyticsMenuAnchor] = useState(null);
 
@@ -80,17 +110,34 @@ export default function DashboardDefault() {
       <Grid sx={{ mb: -2.25 }} size={12}>
         <Typography variant="h5">Dashboard</Typography>
       </Grid>
+      {error && (
+        <Grid size={12}>
+          <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>
+        </Grid>
+      )}
       <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-        <AnalyticEcommerce title="Total Page Views" count="4,42,236" percentage={59.3} extra="35,000" />
+        <AnalyticEcommerce
+            title="Sales Order"
+            count={salesSummary?.totalOrders ?? 0}
+         />
       </Grid>
       <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-        <AnalyticEcommerce title="Total Users" count="78,250" percentage={70.5} extra="8,900" />
+        <AnalyticEcommerce
+             title="Purchase Orders" 
+            count= {purchaseSummary?.totalOrders ?? 0} 
+        />
       </Grid>
       <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-        <AnalyticEcommerce title="Total Order" count="18,800" percentage={27.4} isLoss color="warning" extra="1,943" />
+        <AnalyticEcommerce 
+            title="Stock Items" 
+            count={inventorySummary?.totalStockItems ?? 0}
+        />
       </Grid>
       <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-        <AnalyticEcommerce title="Total Sales" count="35,078" percentage={27.4} isLoss color="warning" extra="20,395" />
+        <AnalyticEcommerce
+            title="Low Stock Items"
+            count={inventorySummary?.lowStockItems ?? 0}
+        />
       </Grid>
       <Grid sx={{ display: { sm: 'none', md: 'block', lg: 'none' } }} size={{ md: 8 }} />
       {/* row 2 */}
