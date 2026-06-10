@@ -4,10 +4,8 @@ namespace ERPSystem.Application.Interfaces.Reports;
 
 public interface IReportRepository
 {
-    Task<List<LowStockReportDto>>
-        GetLowStockItemsAsync();
-    Task<InventorySummaryDto>
-    GetInventorySummaryAsync();
-    Task<SalesSummaryDto>
-    GetSalesSummaryAsync();
+    Task<List<LowStockReportDto>>GetLowStockItemsAsync();
+    Task<InventorySummaryDto>GetInventorySummaryAsync();
+    Task<SalesSummaryDto>GetSalesSummaryAsync();
+    Task<PurchaseSummaryDto>GetPurchaseSummaryAsync();
 }

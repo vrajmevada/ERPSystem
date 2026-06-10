@@ -32,4 +32,10 @@ public class ReportService : IReportService
         return await _repository
             .GetSalesSummaryAsync();
     }
+    public async Task<PurchaseSummaryDto>
+    GetPurchaseSummaryAsync()
+    {
+        return await _repository
+            .GetPurchaseSummaryAsync();
+    }
 }

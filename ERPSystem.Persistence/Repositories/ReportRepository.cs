@@ -81,4 +81,34 @@ public class ReportRepository
             confirmedOrders,
             shippedOrders);
     }
+    public async Task<PurchaseSummaryDto>
+    GetPurchaseSummaryAsync()
+    {
+        var totalOrders =
+            await _context.PurchaseOrders.CountAsync();
+
+        var draftOrders =
+            await _context.PurchaseOrders
+                .CountAsync(p =>
+                    p.Status ==
+                    PurchaseOrderStatus.Draft);
+
+        var approvedOrders =
+            await _context.PurchaseOrders
+                .CountAsync(p =>
+                    p.Status ==
+                    PurchaseOrderStatus.Approved);
+
+        var receivedOrders =
+            await _context.PurchaseOrders
+                .CountAsync(p =>
+                    p.Status ==
+                    PurchaseOrderStatus.Received);
+
+        return new PurchaseSummaryDto(
+            totalOrders,
+            draftOrders,
+            approvedOrders,
+            receivedOrders);
+    }
 }

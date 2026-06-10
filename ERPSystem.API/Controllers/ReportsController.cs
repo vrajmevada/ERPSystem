@@ -44,4 +44,13 @@ public class ReportsController : ControllerBase
             await _service
                 .GetSalesSummaryAsync());
     }
+    [HttpGet("purchase-summary")]
+    public async Task<
+    ActionResult<PurchaseSummaryDto>>
+    GetPurchaseSummary()
+    {
+        return Ok(
+            await _service
+                .GetPurchaseSummaryAsync());
+    }
 }

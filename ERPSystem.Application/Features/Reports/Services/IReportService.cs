@@ -4,8 +4,8 @@ namespace ERPSystem.Application.Features.Reports.Services;
 
 public interface IReportService
 {
-    Task<IEnumerable<LowStockReportDto>>
-        GetLowStockItemsAsync();
+    Task<IEnumerable<LowStockReportDto>>GetLowStockItemsAsync();
     Task<InventorySummaryDto>GetInventorySummaryAsync();
     Task<SalesSummaryDto>GetSalesSummaryAsync();
+    Task<PurchaseSummaryDto>GetPurchaseSummaryAsync();
 }
