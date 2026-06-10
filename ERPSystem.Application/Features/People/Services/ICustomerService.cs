@@ -1,10 +1,15 @@
-﻿using ERPSystem.Application.Features.People.DTOs;
+using ERPSystem.Application.Common;
+using ERPSystem.Application.Features.People.DTOs;
 
 namespace ERPSystem.Application.Features.People.Services;
 
 public interface ICustomerService
 {
-    Task<IEnumerable<CustomerDto>> GetAllAsync();
+    Task<PagedResult<CustomerDto>> GetAllAsync(
+        string? search = null,
+        string? sortBy = null,
+        int? page = null,
+        int? pageSize = null);
 
     Task<CustomerDto?> GetByIdAsync(int id);
 

@@ -1,3 +1,4 @@
+using ERPSystem.Application.Common;
 using ERPSystem.Application.Features.Audit.Services;
 using ERPSystem.Application.Features.Purchasing.DTOs;
 using ERPSystem.Application.Features.Purchasing.Services;
@@ -24,10 +25,13 @@ public class PurchaseOrdersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<PurchaseOrderDto>>>
-        GetAll()
+    public async Task<ActionResult<PagedResult<PurchaseOrderDto>>> GetAll(
+        [FromQuery] string? search,
+        [FromQuery] string? sortBy,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10)
     {
-        return Ok(await _service.GetAllAsync());
+        return Ok(await _service.GetAllAsync(search, sortBy, page, pageSize));
     }
 
     [HttpGet("{id}")]

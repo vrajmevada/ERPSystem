@@ -1,3 +1,4 @@
+using ERPSystem.Application.Common;
 using ERPSystem.Application.Features.People.DTOs;
 using ERPSystem.Application.Features.People.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -20,9 +21,13 @@ public class CustomersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<CustomerDto>>> GetAll()
+    public async Task<ActionResult<PagedResult<CustomerDto>>> GetAll(
+        [FromQuery] string? search,
+        [FromQuery] string? sortBy,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10)
     {
-        return Ok(await _service.GetAllAsync());
+        return Ok(await _service.GetAllAsync(search, sortBy, page, pageSize));
     }
 
     [HttpGet("{id}")]

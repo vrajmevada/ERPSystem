@@ -1,11 +1,15 @@
-﻿using ERPSystem.Application.Features.Purchasing.DTOs;
+using ERPSystem.Application.Common;
+using ERPSystem.Application.Features.Purchasing.DTOs;
 
 namespace ERPSystem.Application.Features.Purchasing.Services;
 
 public interface IPurchaseOrderService
 {
-    Task<IEnumerable<PurchaseOrderDto>>
-        GetAllAsync();
+    Task<PagedResult<PurchaseOrderDto>> GetAllAsync(
+        string? search = null,
+        string? sortBy = null,
+        int? page = null,
+        int? pageSize = null);
 
     Task<PurchaseOrderDto?>
         GetByIdAsync(int id);

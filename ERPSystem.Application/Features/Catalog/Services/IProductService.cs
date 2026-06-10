@@ -1,9 +1,13 @@
-﻿using ERPSystem.Application.Features.Catalog.DTOs;
+using ERPSystem.Application.Common;
+using ERPSystem.Application.Features.Catalog.DTOs;
 namespace ERPSystem.Application.Features.Catalog.Services;
 
 public interface IProductService
 {
-    Task<IEnumerable<ProductDto>> GetAllAsync();
+    Task<PagedResult<ProductDto>> GetAllAsync(string? search = null,
+                                              string? sortBy = null,
+                                              int? page = null,
+                                              int? pageSize = null);
     Task<ProductDto?> GetByIdAsync(int id);
     Task<ProductDto> CreateAsync(CreateProductDto dto);
 }

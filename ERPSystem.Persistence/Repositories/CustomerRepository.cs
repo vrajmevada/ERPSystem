@@ -1,4 +1,4 @@
-﻿using ERPSystem.Application.Interfaces.People;
+using ERPSystem.Application.Interfaces.People;
 using ERPSystem.Domain.Entities.People;
 using ERPSystem.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
@@ -14,9 +14,35 @@ public class CustomerRepository : ICustomerRepository
         _context = context;
     }
 
-    public async Task<List<Customer>> GetAllAsync()
+    public async Task<(List<Customer> Items, int TotalCount)> GetAllAsync(
+        string? search = null,
+        string? sortBy = null,
+        int? page = null,
+        int? pageSize = null)
     {
-        return await _context.Customers.ToListAsync();
+        IQueryable<Customer> query = _context.Customers;
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            query = query.Where(c => c.Name.Contains(search) || c.Email.Contains(search));
+        }
+
+        query = sortBy?.ToLower() switch
+        {
+            "name" => query.OrderBy(c => c.Name),
+            "email" => query.OrderBy(c => c.Email),
+            _ => query.OrderBy(c => c.Id)
+        };
+
+        int totalCount = await query.CountAsync();
+
+        if (page.HasValue && pageSize.HasValue)
+        {
+            query = query.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value);
+        }
+
+        var items = await query.ToListAsync();
+        return (items, totalCount);
     }
 
     public async Task<Customer?> GetByIdAsync(int id)

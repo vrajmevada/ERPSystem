@@ -1,4 +1,4 @@
-﻿using ERPSystem.Application.Interfaces.Catalog;
+using ERPSystem.Application.Interfaces.Catalog;
 using ERPSystem.Domain.Entities.Catalog;
 using ERPSystem.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
@@ -14,11 +14,45 @@ public class ProductRepository : IProductRepository
         _context = context;
     }
 
-    public async Task<List<Product>> GetAllAsync()
+    public async Task<(List<Product> Items, int TotalCount)> GetAllAsync(
+        string? search = null,
+        string? sortBy = null,
+        int? page = null,
+        int? pageSize = null)
     {
-        return await _context.Products
-            .Include(p => p.Category)
-            .ToListAsync();
+        IQueryable<Product> query =
+            _context.Products
+                .Include(p => p.Category);
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            query = query.Where(
+                p => p.Name.Contains(search));
+        }
+
+        query = sortBy?.ToLower() switch
+        {
+            "name" =>
+                query.OrderBy(p => p.Name),
+
+            "price" =>
+                query.OrderBy(p => p.Price),
+
+            _ =>
+                query.OrderBy(p => p.Id)
+        };
+
+        int totalCount = await query.CountAsync();
+
+        if (page.HasValue && pageSize.HasValue)
+        {
+            query = query
+                .Skip((page.Value - 1) * pageSize.Value)
+                .Take(pageSize.Value);
+        }
+
+        var items = await query.ToListAsync();
+        return (items, totalCount);
     }
 
     public async Task<Product?> GetByIdAsync(int id)

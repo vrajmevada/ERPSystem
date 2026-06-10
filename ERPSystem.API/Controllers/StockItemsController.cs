@@ -1,3 +1,4 @@
+using ERPSystem.Application.Common;
 using ERPSystem.Application.Features.Inventory.DTOs;
 using ERPSystem.Application.Features.Inventory.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -20,9 +21,13 @@ public class StockItemsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<StockItemDto>>> GetAll()
+    public async Task<ActionResult<PagedResult<StockItemDto>>> GetAll(
+        [FromQuery] string? search,
+        [FromQuery] string? sortBy,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10)
     {
-        return Ok(await _service.GetAllAsync());
+        return Ok(await _service.GetAllAsync(search, sortBy, page, pageSize));
     }
 
     [HttpGet("{id}")]

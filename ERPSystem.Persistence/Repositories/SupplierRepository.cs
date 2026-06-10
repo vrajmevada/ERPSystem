@@ -1,4 +1,4 @@
-﻿using ERPSystem.Application.Interfaces.People;
+using ERPSystem.Application.Interfaces.People;
 using ERPSystem.Domain.Entities.People;
 using ERPSystem.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
@@ -14,9 +14,35 @@ public class SupplierRepository : ISupplierRepository
         _context = context;
     }
 
-    public async Task<List<Supplier>> GetAllAsync()
+    public async Task<(List<Supplier> Items, int TotalCount)> GetAllAsync(
+        string? search = null,
+        string? sortBy = null,
+        int? page = null,
+        int? pageSize = null)
     {
-        return await _context.Suppliers.ToListAsync();
+        IQueryable<Supplier> query = _context.Suppliers;
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            query = query.Where(s => s.Name.Contains(search) || s.Email.Contains(search));
+        }
+
+        query = sortBy?.ToLower() switch
+        {
+            "name" => query.OrderBy(s => s.Name),
+            "email" => query.OrderBy(s => s.Email),
+            _ => query.OrderBy(s => s.Id)
+        };
+
+        int totalCount = await query.CountAsync();
+
+        if (page.HasValue && pageSize.HasValue)
+        {
+            query = query.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value);
+        }
+
+        var items = await query.ToListAsync();
+        return (items, totalCount);
     }
 
     public async Task<Supplier?> GetByIdAsync(int id)

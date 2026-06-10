@@ -1,4 +1,5 @@
-﻿using ERPSystem.Application.Features.Purchasing.DTOs;
+using ERPSystem.Application.Common;
+using ERPSystem.Application.Features.Purchasing.DTOs;
 using ERPSystem.Application.Interfaces.Purchasing;
 using ERPSystem.Domain.Entities.Purchasing;
 using ERPSystem.Application.Interfaces.Inventory;
@@ -26,13 +27,21 @@ public class PurchaseOrderService
         _transactionRepository = transactionRepository;
     }
 
-    public async Task<IEnumerable<PurchaseOrderDto>>
-        GetAllAsync()
+    public async Task<PagedResult<PurchaseOrderDto>> GetAllAsync(
+        string? search = null,
+        string? sortBy = null,
+        int? page = null,
+        int? pageSize = null)
     {
-        var orders =
-            await _repository.GetAllAsync();
+        var (items, totalCount) = await _repository.GetAllAsync(search, sortBy, page, pageSize);
 
-        return orders.Adapt<List<PurchaseOrderDto>>();
+        var dtos = items.Adapt<List<PurchaseOrderDto>>();
+
+        return new PagedResult<PurchaseOrderDto>(
+            dtos,
+            totalCount,
+            page ?? 1,
+            pageSize ?? totalCount);
     }
 
     public async Task<PurchaseOrderDto?>
@@ -61,7 +70,7 @@ public class PurchaseOrderService
                 "Purchase order must be approved before receiving.");
         }
 
-        var stockItems = await _stockItemRepository.GetAllAsync();
+        var (stockItems, _) = await _stockItemRepository.GetAllAsync();
 
         foreach (var item in order.Items)
         {

@@ -1,4 +1,4 @@
-﻿using ERPSystem.Application.Interfaces.Audit;
+using ERPSystem.Application.Interfaces.Audit;
 using ERPSystem.Domain.Entities.Audit;
 using ERPSystem.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
@@ -25,12 +25,40 @@ public class AuditLogRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task<List<AuditLog>>
-        GetAllAsync()
+    public async Task<(List<AuditLog> Items, int TotalCount)>
+        GetAllAsync(
+            string? search = null,
+            string? sortBy = null,
+            int? page = null,
+            int? pageSize = null)
     {
-        return await _context.AuditLogs
-            .OrderByDescending(
-                a => a.Timestamp)
-            .ToListAsync();
+        IQueryable<AuditLog> query = _context.AuditLogs;
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            query = query.Where(a => 
+                a.UserName.Contains(search) || 
+                a.Action.Contains(search) || 
+                a.EntityName.Contains(search));
+        }
+
+        query = sortBy?.ToLower() switch
+        {
+            "username" => query.OrderBy(a => a.UserName),
+            "action" => query.OrderBy(a => a.Action),
+            "entityname" => query.OrderBy(a => a.EntityName),
+            "timestamp" => query.OrderByDescending(a => a.Timestamp),
+            _ => query.OrderByDescending(a => a.Timestamp)
+        };
+
+        int totalCount = await query.CountAsync();
+
+        if (page.HasValue && pageSize.HasValue)
+        {
+            query = query.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value);
+        }
+
+        var items = await query.ToListAsync();
+        return (items, totalCount);
     }
 }

@@ -1,10 +1,15 @@
-﻿using ERPSystem.Application.Features.Inventory.DTOs;
+using ERPSystem.Application.Common;
+using ERPSystem.Application.Features.Inventory.DTOs;
 
 namespace ERPSystem.Application.Features.Inventory.Services;
 
 public interface IStockItemService
 {
-    Task<IEnumerable<StockItemDto>> GetAllAsync();
+    Task<PagedResult<StockItemDto>> GetAllAsync(
+        string? search = null,
+        string? sortBy = null,
+        int? page = null,
+        int? pageSize = null);
 
     Task<StockItemDto?> GetByIdAsync(int id);
 

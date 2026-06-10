@@ -1,4 +1,6 @@
-﻿namespace ERPSystem.Application.Features.Audit.Services;
+using ERPSystem.Application.Common;
+
+namespace ERPSystem.Application.Features.Audit.Services;
 
 public interface IAuditService
 {
@@ -7,4 +9,10 @@ public interface IAuditService
         string action,
         string entityName,
         int entityId);
+
+    Task<PagedResult<AuditLogDto>> GetAllAsync(
+        string? search = null,
+        string? sortBy = null,
+        int? page = null,
+        int? pageSize = null);
 }

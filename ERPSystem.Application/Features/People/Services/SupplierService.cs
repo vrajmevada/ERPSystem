@@ -1,4 +1,5 @@
-﻿using ERPSystem.Application.Features.People.DTOs;
+using ERPSystem.Application.Common;
+using ERPSystem.Application.Features.People.DTOs;
 using ERPSystem.Application.Interfaces.People;
 using ERPSystem.Domain.Entities.People;
 using Mapster;
@@ -14,11 +15,21 @@ public class SupplierService : ISupplierService
         _repository = repository;
     }
 
-    public async Task<IEnumerable<SupplierDto>> GetAllAsync()
+    public async Task<PagedResult<SupplierDto>> GetAllAsync(
+        string? search = null,
+        string? sortBy = null,
+        int? page = null,
+        int? pageSize = null)
     {
-        var suppliers = await _repository.GetAllAsync();
+        var (items, totalCount) = await _repository.GetAllAsync(search, sortBy, page, pageSize);
 
-        return suppliers.Adapt<List<SupplierDto>>();
+        var dtos = items.Adapt<List<SupplierDto>>();
+
+        return new PagedResult<SupplierDto>(
+            dtos,
+            totalCount,
+            page ?? 1,
+            pageSize ?? totalCount);
     }
 
     public async Task<SupplierDto?> GetByIdAsync(int id)

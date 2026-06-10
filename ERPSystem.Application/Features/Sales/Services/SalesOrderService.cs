@@ -1,4 +1,5 @@
-﻿using ERPSystem.Application.Features.Sales.DTOs;
+using ERPSystem.Application.Common;
+using ERPSystem.Application.Features.Sales.DTOs;
 using ERPSystem.Application.Interfaces.Sales;
 using ERPSystem.Domain.Entities.Sales;
 using ERPSystem.Domain.Enums;
@@ -27,13 +28,21 @@ public class SalesOrderService
         _transactionRepository = transactionRepository;
     }
 
-    public async Task<IEnumerable<SalesOrderDto>>
-        GetAllAsync()
+    public async Task<PagedResult<SalesOrderDto>> GetAllAsync(
+        string? search = null,
+        string? sortBy = null,
+        int? page = null,
+        int? pageSize = null)
     {
-        var orders =
-            await _repository.GetAllAsync();
+        var (items, totalCount) = await _repository.GetAllAsync(search, sortBy, page, pageSize);
 
-        return orders.Adapt<List<SalesOrderDto>>();
+        var dtos = items.Adapt<List<SalesOrderDto>>();
+
+        return new PagedResult<SalesOrderDto>(
+            dtos,
+            totalCount,
+            page ?? 1,
+            pageSize ?? totalCount);
     }
 
     public async Task<SalesOrderDto?>
@@ -84,7 +93,7 @@ public class SalesOrderService
             throw new BusinessException(
                 "Sales order already shipped.");
 
-        var stockItems = await _stockItemRepository.GetAllAsync();
+        var (stockItems, _) = await _stockItemRepository.GetAllAsync();
 
         foreach (var item in order.Items)
         {

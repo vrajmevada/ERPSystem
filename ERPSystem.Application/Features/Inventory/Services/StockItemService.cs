@@ -1,4 +1,5 @@
-﻿using ERPSystem.Application.Features.Inventory.DTOs;
+using ERPSystem.Application.Common;
+using ERPSystem.Application.Features.Inventory.DTOs;
 using ERPSystem.Application.Interfaces.Inventory;
 using ERPSystem.Domain.Entities.Inventory;
 using Mapster;
@@ -14,11 +15,21 @@ public class StockItemService : IStockItemService
         _repository = repository;
     }
 
-    public async Task<IEnumerable<StockItemDto>> GetAllAsync()
+    public async Task<PagedResult<StockItemDto>> GetAllAsync(
+        string? search = null,
+        string? sortBy = null,
+        int? page = null,
+        int? pageSize = null)
     {
-        var items = await _repository.GetAllAsync();
+        var (items, totalCount) = await _repository.GetAllAsync(search, sortBy, page, pageSize);
 
-        return items.Adapt<List<StockItemDto>>();
+        var dtos = items.Adapt<List<StockItemDto>>();
+
+        return new PagedResult<StockItemDto>(
+            dtos,
+            totalCount,
+            page ?? 1,
+            pageSize ?? totalCount);
     }
 
     public async Task<StockItemDto?> GetByIdAsync(int id)

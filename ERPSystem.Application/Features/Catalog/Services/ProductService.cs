@@ -1,4 +1,5 @@
-﻿using ERPSystem.Application.Features.Catalog.DTOs;
+using ERPSystem.Application.Common;
+using ERPSystem.Application.Features.Catalog.DTOs;
 using ERPSystem.Application.Interfaces.Catalog;
 using ERPSystem.Domain.Entities.Catalog;
 using Mapster;
@@ -14,11 +15,27 @@ public class ProductService : IProductService
         _repository = repository;
     }
 
-    public async Task<IEnumerable<ProductDto>> GetAllAsync()
+    public async Task<PagedResult<ProductDto>>
+    GetAllAsync(
+        string? search = null,
+        string? sortBy = null,
+        int? page = null,
+        int? pageSize = null)
     {
-        var products = await _repository.GetAllAsync();
+        var (items, totalCount) =
+            await _repository.GetAllAsync(
+                search,
+                sortBy,
+                page,
+                pageSize);
 
-        return products.Adapt<List<ProductDto>>();
+        var dtos = items.Adapt<List<ProductDto>>();
+
+        return new PagedResult<ProductDto>(
+            dtos,
+            totalCount,
+            page ?? 1,
+            pageSize ?? totalCount);
     }
 
     public async Task<ProductDto?> GetByIdAsync(int id)

@@ -1,4 +1,4 @@
-﻿using ERPSystem.Application.Interfaces.Purchasing;
+using ERPSystem.Application.Interfaces.Purchasing;
 using ERPSystem.Domain.Entities.Purchasing;
 using ERPSystem.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
@@ -16,13 +16,39 @@ public class PurchaseOrderRepository
         _context = context;
     }
 
-    public async Task<List<PurchaseOrder>> GetAllAsync()
+    public async Task<(List<PurchaseOrder> Items, int TotalCount)> GetAllAsync(
+        string? search = null,
+        string? sortBy = null,
+        int? page = null,
+        int? pageSize = null)
     {
-        return await _context.PurchaseOrders
+        IQueryable<PurchaseOrder> query = _context.PurchaseOrders
             .Include(p => p.Supplier)
             .Include(p => p.Items)
-                .ThenInclude(i => i.Product)
-            .ToListAsync();
+                .ThenInclude(i => i.Product);
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            query = query.Where(p => p.OrderNumber.Contains(search) || p.Supplier.Name.Contains(search));
+        }
+
+        query = sortBy?.ToLower() switch
+        {
+            "ordernumber" => query.OrderBy(p => p.OrderNumber),
+            "orderdate" => query.OrderBy(p => p.OrderDate),
+            "status" => query.OrderBy(p => p.Status),
+            _ => query.OrderBy(p => p.Id)
+        };
+
+        int totalCount = await query.CountAsync();
+
+        if (page.HasValue && pageSize.HasValue)
+        {
+            query = query.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value);
+        }
+
+        var items = await query.ToListAsync();
+        return (items, totalCount);
     }
 
     public async Task<PurchaseOrder?> GetByIdAsync(int id)
