@@ -7,4 +7,5 @@ public interface IReportService
     Task<IEnumerable<LowStockReportDto>>
         GetLowStockItemsAsync();
     Task<InventorySummaryDto>GetInventorySummaryAsync();
+    Task<SalesSummaryDto>GetSalesSummaryAsync();
 }

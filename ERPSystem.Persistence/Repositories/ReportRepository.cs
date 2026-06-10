@@ -1,6 +1,7 @@
 ﻿using ERPSystem.Application.Features.Reports.DTOs;
 using ERPSystem.Application.Interfaces.Reports;
 using ERPSystem.Persistence.Context;
+using ERPSystem.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace ERPSystem.Persistence.Repositories;
@@ -49,5 +50,35 @@ public class ReportRepository
             totalStockItems,
             totalQuantity,
             lowStockItems);
+    }
+    public async Task<SalesSummaryDto>
+    GetSalesSummaryAsync()
+    {
+        var totalOrders =
+            await _context.SalesOrders.CountAsync();
+
+        var draftOrders =
+            await _context.SalesOrders
+                .CountAsync(s =>
+                    s.Status ==
+                    SalesOrderStatus.Draft);
+
+        var confirmedOrders =
+            await _context.SalesOrders
+                .CountAsync(s =>
+                    s.Status ==
+                    SalesOrderStatus.Confirmed);
+
+        var shippedOrders =
+            await _context.SalesOrders
+                .CountAsync(s =>
+                    s.Status ==
+                    SalesOrderStatus.Shipped);
+
+        return new SalesSummaryDto(
+            totalOrders,
+            draftOrders,
+            confirmedOrders,
+            shippedOrders);
     }
 }
