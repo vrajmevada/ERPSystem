@@ -35,6 +35,19 @@ using System.Text.Json.Serialization;
 
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("ReactPolicy", policy =>
+    {
+        policy
+            .WithOrigins(
+                "http://localhost:3000",
+                "http://localhost:5173"
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 
 builder.Services.AddControllers();
 
@@ -217,9 +230,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseHttpsRedirection();
+app.UseCors("ReactPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseHttpsRedirection();
+
 
 app.MapControllers();
 Console.WriteLine(
