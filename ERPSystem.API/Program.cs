@@ -1,6 +1,4 @@
 using ERPSystem.API.Exceptions;
-using Microsoft.OpenApi;
-using ERPSystem.Domain.Entities.Identity;
 using ERPSystem.Application.Features.Catalog.Mapping;
 using ERPSystem.Application.Features.Catalog.Services;
 using ERPSystem.Application.Features.Catalog.Validators;
@@ -11,6 +9,7 @@ using ERPSystem.Application.Features.Inventory.Services;
 using ERPSystem.Application.Features.People.Services;
 using ERPSystem.Application.Features.Purchasing.Services;
 using ERPSystem.Application.Features.Sales.Services;
+using ERPSystem.Application.Interfaces.Audit;
 using ERPSystem.Application.Interfaces.Catalog;
 using ERPSystem.Application.Interfaces.Dashboard;
 using ERPSystem.Application.Interfaces.Identity;
@@ -19,15 +18,15 @@ using ERPSystem.Application.Interfaces.People;
 using ERPSystem.Application.Interfaces.Purchasing;
 using ERPSystem.Application.Interfaces.Sales;
 using ERPSystem.Application.Security;
+using ERPSystem.Domain.Entities.Identity;
 using ERPSystem.Persistence.Context;
 using ERPSystem.Persistence.Repositories;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using Microsoft.EntityFrameworkCore;
-
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-
+using Microsoft.OpenApi;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -152,6 +151,9 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     IAuthService,
     AuthService>();
+builder.Services.AddScoped<
+    IAuditLogRepository,
+    AuditLogRepository>();
 var jwtSettings =
     builder.Configuration
         .GetSection("JwtSettings")

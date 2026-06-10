@@ -4,6 +4,7 @@ using ERPSystem.Domain.Entities.People;
 using ERPSystem.Domain.Entities.Purchasing;
 using ERPSystem.Domain.Entities.Sales;
 using ERPSystem.Domain.Entities.Identity;
+using ERPSystem.Domain.Entities.Audit;
 using Microsoft.EntityFrameworkCore;
 
 namespace ERPSystem.Persistence.Context;
@@ -31,6 +32,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<SalesOrder> SalesOrders => Set<SalesOrder>();
     public DbSet<SalesOrderItem> SalesOrderItems => Set<SalesOrderItem>();
     public DbSet<User> Users => Set<User>();
+    public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<InventoryTransaction>()
