@@ -9,6 +9,7 @@ using ERPSystem.Application.Features.Inventory.Mapping;
 using ERPSystem.Application.Features.Inventory.Services;
 using ERPSystem.Application.Features.People.Services;
 using ERPSystem.Application.Features.Purchasing.Services;
+using ERPSystem.Application.Features.Reports.Services;
 using ERPSystem.Application.Features.Sales.Services;
 using ERPSystem.Application.Interfaces.Audit;
 using ERPSystem.Application.Interfaces.Catalog;
@@ -17,6 +18,7 @@ using ERPSystem.Application.Interfaces.Identity;
 using ERPSystem.Application.Interfaces.Inventory;
 using ERPSystem.Application.Interfaces.People;
 using ERPSystem.Application.Interfaces.Purchasing;
+using ERPSystem.Application.Interfaces.Reports;
 using ERPSystem.Application.Interfaces.Sales;
 using ERPSystem.Application.Security;
 using ERPSystem.Domain.Entities.Identity;
@@ -112,6 +114,13 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     IAuditService,
     AuditService>();
+builder.Services.AddScoped<
+    IReportRepository,
+    ReportRepository>();
+
+builder.Services.AddScoped<
+    IReportService,
+    ReportService>();
 
 builder.Services.AddScoped<
     IInventoryTransactionService,
