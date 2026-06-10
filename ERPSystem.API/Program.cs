@@ -1,4 +1,5 @@
 using ERPSystem.API.Exceptions;
+using ERPSystem.Application.Features.Audit.Services;
 using ERPSystem.Application.Features.Catalog.Mapping;
 using ERPSystem.Application.Features.Catalog.Services;
 using ERPSystem.Application.Features.Catalog.Validators;
@@ -108,6 +109,9 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     IInventoryTransactionRepository,
     InventoryTransactionRepository>();
+builder.Services.AddScoped<
+    IAuditService,
+    AuditService>();
 
 builder.Services.AddScoped<
     IInventoryTransactionService,

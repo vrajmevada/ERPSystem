@@ -1,9 +1,10 @@
+using ERPSystem.Application.Features.Audit.Services;
+using ERPSystem.Application.Features.Purchasing.Services;
 using ERPSystem.Application.Features.Sales.DTOs;
 using ERPSystem.Application.Features.Sales.Services;
-using Microsoft.AspNetCore.Mvc;
-
-using Microsoft.AspNetCore.Authorization;
 using ERPSystem.Application.Security;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ERPSystem.API.Controllers;
 
@@ -13,11 +14,14 @@ namespace ERPSystem.API.Controllers;
 public class SalesOrdersController : ControllerBase
 {
     private readonly ISalesOrderService _service;
+    private readonly IAuditService _auditService;
 
     public SalesOrdersController(
-        ISalesOrderService service)
+    ISalesOrderService service,
+    IAuditService auditService)
     {
         _service = service;
+        _auditService = auditService;
     }
 
     [HttpGet]
@@ -54,6 +58,11 @@ public class SalesOrdersController : ControllerBase
     public async Task<IActionResult> Ship(int id)
     {
         await _service.ShipAsync(id);
+        await _auditService.LogAsync(
+            User.Identity?.Name ?? "Unknown",
+            "Ship",
+            "SalesOrder",
+            id);
 
         return NoContent();
     }
@@ -63,6 +72,11 @@ public class SalesOrdersController : ControllerBase
     {
         await _service.ConfirmAsync(id);
 
+        await _auditService.LogAsync(
+            User.Identity?.Name ?? "Unknown",
+            "Confirm",
+            "SalesOrder",
+            id);
         return NoContent();
     }
 }

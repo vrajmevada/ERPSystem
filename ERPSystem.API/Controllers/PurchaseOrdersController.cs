@@ -1,9 +1,9 @@
+using ERPSystem.Application.Features.Audit.Services;
 using ERPSystem.Application.Features.Purchasing.DTOs;
 using ERPSystem.Application.Features.Purchasing.Services;
-using Microsoft.AspNetCore.Mvc;
-
-using Microsoft.AspNetCore.Authorization;
 using ERPSystem.Application.Security;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ERPSystem.API.Controllers;
 
@@ -13,11 +13,14 @@ namespace ERPSystem.API.Controllers;
 public class PurchaseOrdersController : ControllerBase
 {
     private readonly IPurchaseOrderService _service;
+    private readonly IAuditService _auditService;
 
     public PurchaseOrdersController(
-        IPurchaseOrderService service)
+    IPurchaseOrderService service,
+    IAuditService auditService)
     {
         _service = service;
+        _auditService = auditService;
     }
 
     [HttpGet]
@@ -54,14 +57,27 @@ public class PurchaseOrdersController : ControllerBase
     {
         await _service.ReceiveAsync(id);
 
+        await _auditService.LogAsync(
+            User.Identity?.Name ?? "Unknown",
+            "Receive",
+            "PurchaseOrder",
+            id);
         return NoContent();
     }
     [HttpPost("{id}/approve")]
     [Authorize(Policy = AppPolicies.OrderApprove)]
-    public async Task<IActionResult> Approve(int id)
+    public async Task<IActionResult>
+    Approve(int id)
     {
         await _service.ApproveAsync(id);
 
+        await _auditService.LogAsync(
+            User.Identity?.Name ?? "Unknown",
+            "Approve",
+            "PurchaseOrder",
+            id);
+
         return NoContent();
     }
+
 }
