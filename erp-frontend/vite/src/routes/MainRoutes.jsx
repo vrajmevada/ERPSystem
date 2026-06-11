@@ -19,6 +19,7 @@ const WarehousesPage = Loadable(lazy(() => import('pages/placeholder/WarehousesP
 const TransactionsPage = Loadable(lazy(() => import('pages/placeholder/TransactionsPage')));
 const PurchaseOrdersPage = Loadable(lazy(() => import('pages/placeholder/PurchaseOrdersPage')));
 const SalesOrdersPage = Loadable(lazy(() => import('pages/placeholder/SalesOrdersPage')));
+const AuditLogsPage = Loadable(lazy(() => import('pages/placeholder/AuditLogsPage')));
 
 // render - color
 const Color = Loadable(lazy(() => import('pages/component-overview/color')));
@@ -82,6 +83,10 @@ const MainRoutes = {
     {
       path: 'sales-orders',
       element: <SalesOrdersPage />
+    },
+    {
+      path: 'audit-logs',
+      element: <AuditLogsPage />
     },
     {
       path: 'typography',

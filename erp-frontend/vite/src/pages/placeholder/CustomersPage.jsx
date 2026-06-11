@@ -31,6 +31,7 @@ import {
   updateCustomer,
   deleteCustomer
 } from 'api/customers';
+import useAuth from 'hooks/useAuth';
 
 // Simple debounce helper
 function useDebounce(value, delay) {
@@ -50,6 +51,10 @@ function useDebounce(value, delay) {
 }
 
 export default function CustomersPage() {
+  const { user } = useAuth();
+  const role = user?.role?.trim().toLowerCase();
+  const canWrite = role === 'admin' || role === 'manager';
+
   const [rows, setRows] = useState([]);
   const [totalRows, setTotalRows] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -230,20 +235,26 @@ export default function CustomersPage() {
       sortable: false,
       renderCell: (params) => (
         <Stack direction="row" spacing={1} alignItems="center" height="100%">
-          <IconButton
-            color="primary"
-            size="small"
-            onClick={() => handleOpenEditDialog(params.row)}
-          >
-            <EditOutlined />
-          </IconButton>
-          <IconButton
-            color="error"
-            size="small"
-            onClick={() => handleOpenDeleteConfirm(params.row)}
-          >
-            <DeleteOutlined />
-          </IconButton>
+          {canWrite ? (
+            <>
+              <IconButton
+                color="primary"
+                size="small"
+                onClick={() => handleOpenEditDialog(params.row)}
+              >
+                <EditOutlined />
+              </IconButton>
+              <IconButton
+                color="error"
+                size="small"
+                onClick={() => handleOpenDeleteConfirm(params.row)}
+              >
+                <DeleteOutlined />
+              </IconButton>
+            </>
+          ) : (
+            <Typography variant="caption" color="textSecondary">Read-only</Typography>
+          )}
         </Stack>
       )
     }
@@ -263,13 +274,15 @@ export default function CustomersPage() {
             </Typography>
           </Grid>
           <Grid item>
-            <Button
-              variant="contained"
-              startIcon={<PlusOutlined />}
-              onClick={handleOpenAddDialog}
-            >
-              Add Customer
-            </Button>
+            {canWrite && (
+              <Button
+                variant="contained"
+                startIcon={<PlusOutlined />}
+                onClick={handleOpenAddDialog}
+              >
+                Add Customer
+              </Button>
+            )}
           </Grid>
         </Grid>
       </Box>
@@ -355,7 +368,7 @@ export default function CustomersPage() {
                   ? 'No customers match your search criteria.'
                   : 'Create your first customer to get started.'}
               </Typography>
-              {!search && (
+              {!search && canWrite && (
                 <Button variant="contained" onClick={handleOpenAddDialog} startIcon={<PlusOutlined />}>
                   Create your first customer
                 </Button>

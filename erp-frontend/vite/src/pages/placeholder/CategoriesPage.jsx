@@ -31,8 +31,12 @@ import {
   updateCategory,
   deleteCategory
 } from 'api/categories';
+import useAuth from 'hooks/useAuth';
 
 export default function CategoriesPage() {
+  const { user } = useAuth();
+  const role = user?.role?.trim().toLowerCase();
+  const canWrite = role === 'admin' || role === 'manager';
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
@@ -186,20 +190,26 @@ export default function CategoriesPage() {
       sortable: false,
       renderCell: (params) => (
         <Stack direction="row" spacing={1} alignItems="center" height="100%">
-          <IconButton
-            color="primary"
-            size="small"
-            onClick={() => handleOpenEditDialog(params.row)}
-          >
-            <EditOutlined />
-          </IconButton>
-          <IconButton
-            color="error"
-            size="small"
-            onClick={() => handleOpenDeleteConfirm(params.row)}
-          >
-            <DeleteOutlined />
-          </IconButton>
+          {canWrite ? (
+            <>
+              <IconButton
+                color="primary"
+                size="small"
+                onClick={() => handleOpenEditDialog(params.row)}
+              >
+                <EditOutlined />
+              </IconButton>
+              <IconButton
+                color="error"
+                size="small"
+                onClick={() => handleOpenDeleteConfirm(params.row)}
+              >
+                <DeleteOutlined />
+              </IconButton>
+            </>
+          ) : (
+            <Typography variant="caption" color="textSecondary">Read-only</Typography>
+          )}
         </Stack>
       )
     }
@@ -219,13 +229,15 @@ export default function CategoriesPage() {
             </Typography>
           </Grid>
           <Grid item>
-            <Button
-              variant="contained"
-              startIcon={<PlusOutlined />}
-              onClick={handleOpenAddDialog}
-            >
-              Add Category
-            </Button>
+            {canWrite && (
+              <Button
+                variant="contained"
+                startIcon={<PlusOutlined />}
+                onClick={handleOpenAddDialog}
+              >
+                Add Category
+              </Button>
+            )}
           </Grid>
         </Grid>
       </Box>
@@ -311,7 +323,7 @@ export default function CategoriesPage() {
                   ? 'No categories match your search criteria.'
                   : 'Create your first category to get started.'}
               </Typography>
-              {!search && (
+              {!search && canWrite && (
                 <Button variant="contained" onClick={handleOpenAddDialog} startIcon={<PlusOutlined />}>
                   Create your first category
                 </Button>

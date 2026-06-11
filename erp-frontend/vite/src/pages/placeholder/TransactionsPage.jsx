@@ -33,6 +33,7 @@ import {
   createInventoryTransaction
 } from 'api/inventoryTransactions';
 import { getStockItems } from 'api/stockItems';
+import useAuth from 'hooks/useAuth';
 
 // Enum mapping for Transaction Types
 const TRANSACTION_TYPES = {
@@ -43,6 +44,10 @@ const TRANSACTION_TYPES = {
 };
 
 export default function TransactionsPage() {
+  const { user } = useAuth();
+  const role = user?.role?.trim().toLowerCase();
+  const canOperate = role === 'admin' || role === 'manager' || role === 'operator';
+
   const [transactions, setTransactions] = useState([]);
   const [stockItems, setStockItems] = useState([]);
   const [stockItemLookup, setStockItemLookup] = useState({});
@@ -240,13 +245,15 @@ export default function TransactionsPage() {
             </Typography>
           </Grid>
           <Grid item>
-            <Button
-              variant="contained"
-              startIcon={<PlusOutlined />}
-              onClick={handleOpenAddDialog}
-            >
-              Record Transaction
-            </Button>
+            {canOperate && (
+              <Button
+                variant="contained"
+                startIcon={<PlusOutlined />}
+                onClick={handleOpenAddDialog}
+              >
+                Record Transaction
+              </Button>
+            )}
           </Grid>
         </Grid>
       </Box>
@@ -332,7 +339,7 @@ export default function TransactionsPage() {
                   ? 'No transactions match your search criteria.'
                   : 'Record your first transaction to get started.'}
               </Typography>
-              {!search && (
+              {!search && canOperate && (
                 <Button variant="contained" onClick={handleOpenAddDialog} startIcon={<PlusOutlined />}>
                   Record first transaction
                 </Button>

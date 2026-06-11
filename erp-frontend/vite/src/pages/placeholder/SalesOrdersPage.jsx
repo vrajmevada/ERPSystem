@@ -41,6 +41,8 @@ import {
 import { getCustomers } from 'api/customers';
 import { getWarehouses } from 'api/warehouses';
 import { getProducts } from 'api/products';
+import { getStockItems } from 'api/stockItems';
+import useAuth from 'hooks/useAuth';
 
 // Debounce helper
 function useDebounce(value, delay) {
@@ -62,12 +64,20 @@ function useDebounce(value, delay) {
 // Status mappings
 const STATUS_TYPES = {
   1: { label: 'Draft', color: 'default' },
+  'Draft': { label: 'Draft', color: 'default' },
   2: { label: 'Confirmed', color: 'primary' },
+  'Confirmed': { label: 'Confirmed', color: 'primary' },
   3: { label: 'Shipped', color: 'success' },
-  4: { label: 'Cancelled', color: 'error' }
+  'Shipped': { label: 'Shipped', color: 'success' },
+  4: { label: 'Cancelled', color: 'error' },
+  'Cancelled': { label: 'Cancelled', color: 'error' }
 };
 
 export default function SalesOrdersPage() {
+  const { user } = useAuth();
+  const role = user?.role?.trim().toLowerCase();
+  const canOperate = role === 'admin' || role === 'manager' || role === 'operator';
+
   const [rows, setRows] = useState([]);
   const [totalRows, setTotalRows] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -82,6 +92,7 @@ export default function SalesOrdersPage() {
   const [customers, setCustomers] = useState([]);
   const [warehouses, setWarehouses] = useState([]);
   const [products, setProducts] = useState([]);
+  const [stockItems, setStockItems] = useState([]);
 
   // Dialog & Form states
   const [open, setOpen] = useState(false);
@@ -123,6 +134,9 @@ export default function SalesOrdersPage() {
 
       const prodResult = await getProducts('', 1, 200);
       setProducts(prodResult.items || []);
+
+      const stockResult = await getStockItems('', 1, 500);
+      setStockItems(stockResult.items || []);
     } catch (err) {
       console.error('Failed to load order metadata dropdowns:', err);
     }
@@ -149,13 +163,19 @@ export default function SalesOrdersPage() {
     setSnackbar((prev) => ({ ...prev, open: false }));
   };
 
-  const handleOpenAddDialog = () => {
+  const handleOpenAddDialog = async () => {
     setCustomerId('');
     setWarehouseId('');
     setOrderItems([{ productId: '', quantity: 1, unitPrice: 0.0 }]);
     setSubmitError('');
     setFieldErrors({});
     setOpen(true);
+    try {
+      const stockResult = await getStockItems('', 1, 500);
+      setStockItems(stockResult.items || []);
+    } catch (err) {
+      console.error('Failed to refresh stock metadata:', err);
+    }
   };
 
   const handleCloseDialog = () => {
@@ -194,18 +214,35 @@ export default function SalesOrdersPage() {
 
     const itemErrors = [];
     orderItems.forEach((item, index) => {
+      let rowErrors = {};
       if (!item.productId) {
-        itemErrors[index] = { productId: 'Product is required' };
+        rowErrors.productId = 'Product is required';
       }
       if (!item.quantity || item.quantity <= 0) {
-        itemErrors[index] = { ...itemErrors[index], quantity: 'Qty > 0' };
+        rowErrors.quantity = 'Qty > 0';
       }
       if (item.unitPrice === undefined || item.unitPrice < 0) {
-        itemErrors[index] = { ...itemErrors[index], unitPrice: 'Price >= 0' };
+        rowErrors.unitPrice = 'Price >= 0';
+      }
+
+      // Inventory Validation
+      if (warehouseId && item.productId) {
+        const matchingStock = stockItems.find(
+          (s) => s.productId === item.productId && s.warehouseId === warehouseId
+        );
+        const available = matchingStock ? matchingStock.quantity : 0;
+        if (item.quantity > available) {
+          rowErrors.quantity = `❌ Insufficient Stock. Available: ${available}. Requested: ${item.quantity}`;
+        }
+      }
+
+      if (Object.keys(rowErrors).length > 0) {
+        itemErrors[index] = rowErrors;
       }
     });
 
-    if (itemErrors.length > 0) {
+    const hasItemErrors = itemErrors.some((err) => err && Object.keys(err).length > 0);
+    if (hasItemErrors) {
       errors.items = itemErrors;
     }
 
@@ -323,16 +360,23 @@ export default function SalesOrdersPage() {
       sortable: false,
       renderCell: (params) => {
         const status = params.row.status;
+        const showConfirm = (status === 1 || status === 'Draft') && canOperate;
+        const showShip = (status === 2 || status === 'Confirmed') && canOperate;
+
+        if (!showConfirm && !showShip) {
+          return <Typography variant="caption" color="textSecondary">—</Typography>;
+        }
+
         return (
           <Stack direction="row" spacing={1} alignItems="center" height="100%">
-            {status === 1 && (
+            {showConfirm && (
               <Tooltip title="Confirm Order">
                 <IconButton color="primary" size="small" onClick={() => handleConfirmOrder(params.row.id)}>
                   <CheckCircleOutlined />
                 </IconButton>
               </Tooltip>
             )}
-            {status === 2 && (
+            {showShip && (
               <Tooltip title="Ship Order">
                 <IconButton color="success" size="small" onClick={() => handleShipOrder(params.row.id)}>
                   <TruckOutlined />
@@ -359,13 +403,15 @@ export default function SalesOrdersPage() {
             </Typography>
           </Grid>
           <Grid item>
-            <Button
-              variant="contained"
-              startIcon={<PlusOutlined />}
-              onClick={handleOpenAddDialog}
-            >
-              New Sales Order
-            </Button>
+            {canOperate && (
+              <Button
+                variant="contained"
+                startIcon={<PlusOutlined />}
+                onClick={handleOpenAddDialog}
+              >
+                New Sales Order
+              </Button>
+            )}
           </Grid>
         </Grid>
       </Box>
@@ -451,7 +497,7 @@ export default function SalesOrdersPage() {
                   ? 'No orders match your search criteria.'
                   : 'Create your first sales order to get started.'}
               </Typography>
-              {!search && (
+              {!search && canOperate && (
                 <Button variant="contained" onClick={handleOpenAddDialog} startIcon={<PlusOutlined />}>
                   New Sales Order
                 </Button>
@@ -536,49 +582,59 @@ export default function SalesOrdersPage() {
             <Typography variant="h5">Order Items</Typography>
 
             {/* Order Items List */}
-            {orderItems.map((item, index) => (
-              <Grid container spacing={2} key={index} alignItems="center">
-                {/* Product Select */}
-                <Grid item xs={12} sm={5}>
-                  <FormControl
-                    fullWidth
-                    error={Boolean(fieldErrors.items?.[index]?.productId)}
-                    required
-                  >
-                    <InputLabel id={`product-select-label-${index}`}>Product</InputLabel>
-                    <Select
-                      labelId={`product-select-label-${index}`}
-                      value={item.productId}
-                      label="Product"
-                      onChange={(e) => handleItemFieldChange(index, 'productId', e.target.value)}
-                    >
-                      {products.map((p) => (
-                        <MenuItem key={p.id} value={p.id}>
-                          {p.name} (${Number(p.price).toFixed(2)})
-                        </MenuItem>
-                      ))}
-                    </Select>
-                    {fieldErrors.items?.[index]?.productId && (
-                      <FormHelperText>{fieldErrors.items?.[index]?.productId}</FormHelperText>
-                    )}
-                  </FormControl>
-                </Grid>
+            {orderItems.map((item, index) => {
+              const matchingStock = stockItems.find(
+                (s) => s.productId === item.productId && s.warehouseId === warehouseId
+              );
+              const available = warehouseId && item.productId ? (matchingStock ? matchingStock.quantity : 0) : null;
 
-                {/* Quantity */}
-                <Grid item xs={12} sm={3}>
-                  <TextField
-                    label="Quantity"
-                    type="number"
-                    value={item.quantity}
-                    onChange={(e) =>
-                      handleItemFieldChange(index, 'quantity', parseInt(e.target.value, 10) || 0)
-                    }
-                    error={Boolean(fieldErrors.items?.[index]?.quantity)}
-                    helperText={fieldErrors.items?.[index]?.quantity}
-                    required
-                    fullWidth
-                  />
-                </Grid>
+              return (
+                <Grid container spacing={2} key={index} alignItems="center">
+                  {/* Product Select */}
+                  <Grid item xs={12} sm={5}>
+                    <FormControl
+                      fullWidth
+                      error={Boolean(fieldErrors.items?.[index]?.productId)}
+                      required
+                    >
+                      <InputLabel id={`product-select-label-${index}`}>Product</InputLabel>
+                      <Select
+                        labelId={`product-select-label-${index}`}
+                        value={item.productId}
+                        label="Product"
+                        onChange={(e) => handleItemFieldChange(index, 'productId', e.target.value)}
+                      >
+                        {products.map((p) => {
+                          const pStock = stockItems.find((s) => s.productId === p.id && s.warehouseId === warehouseId);
+                          const pAvailable = warehouseId ? (pStock ? pStock.quantity : 0) : null;
+                          return (
+                            <MenuItem key={p.id} value={p.id}>
+                              {p.name} (${Number(p.price).toFixed(2)}) {pAvailable !== null ? `[Stock: ${pAvailable}]` : ''}
+                            </MenuItem>
+                          );
+                        })}
+                      </Select>
+                      {fieldErrors.items?.[index]?.productId && (
+                        <FormHelperText>{fieldErrors.items?.[index]?.productId}</FormHelperText>
+                      )}
+                    </FormControl>
+                  </Grid>
+
+                  {/* Quantity */}
+                  <Grid item xs={12} sm={3}>
+                    <TextField
+                      label="Quantity"
+                      type="number"
+                      value={item.quantity}
+                      onChange={(e) =>
+                        handleItemFieldChange(index, 'quantity', parseInt(e.target.value, 10) || 0)
+                      }
+                      error={Boolean(fieldErrors.items?.[index]?.quantity)}
+                      helperText={fieldErrors.items?.[index]?.quantity || (available !== null ? `Available: ${available}` : '')}
+                      required
+                      fullWidth
+                    />
+                  </Grid>
 
                 {/* Unit Price */}
                 <Grid item xs={12} sm={3}>
@@ -607,7 +663,8 @@ export default function SalesOrdersPage() {
                   </IconButton>
                 </Grid>
               </Grid>
-            ))}
+            );
+          })}
 
             <Stack direction="row" justifyContent="space-between" alignItems="center">
               <Button variant="outlined" startIcon={<PlusOutlined />} onClick={handleAddItemRow}>

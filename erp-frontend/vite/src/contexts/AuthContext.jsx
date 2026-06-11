@@ -30,7 +30,8 @@ export function AuthProvider({ children }) {
     const decoded = decodeToken(token);
     if (!decoded) return null;
     const username = decoded['unique_name'] || decoded['name'] || decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] || '';
-    const role = decoded['role'] || decoded['http://schemas.xmlsoap.org/ws/2008/06/identity/claims/role'] || '';
+    const role = decoded['role'] || decoded['http://schemas.xmlsoap.org/ws/2008/06/identity/claims/role'] || decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || '';
+    console.log('[AuthContext] Decoded user:', { username, role }, 'from token:', decoded);
     return { username, role };
   }, [token]);
 

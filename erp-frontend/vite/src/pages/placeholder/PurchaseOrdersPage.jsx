@@ -41,6 +41,7 @@ import {
 import { getSuppliers } from 'api/suppliers';
 import { getWarehouses } from 'api/warehouses';
 import { getProducts } from 'api/products';
+import useAuth from 'hooks/useAuth';
 
 // Debounce helper
 function useDebounce(value, delay) {
@@ -62,12 +63,21 @@ function useDebounce(value, delay) {
 // Status mappings
 const STATUS_TYPES = {
   1: { label: 'Draft', color: 'default' },
+  'Draft': { label: 'Draft', color: 'default' },
   2: { label: 'Approved', color: 'primary' },
+  'Approved': { label: 'Approved', color: 'primary' },
   3: { label: 'Received', color: 'success' },
-  4: { label: 'Cancelled', color: 'error' }
+  'Received': { label: 'Received', color: 'success' },
+  4: { label: 'Cancelled', color: 'error' },
+  'Cancelled': { label: 'Cancelled', color: 'error' }
 };
 
 export default function PurchaseOrdersPage() {
+  const { user } = useAuth();
+  const role = user?.role?.trim().toLowerCase();
+  const canOperate = role === 'admin' || role === 'manager' || role === 'operator';
+  const canApprove = role === 'admin' || role === 'manager';
+
   const [rows, setRows] = useState([]);
   const [totalRows, setTotalRows] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -323,16 +333,23 @@ export default function PurchaseOrdersPage() {
       sortable: false,
       renderCell: (params) => {
         const status = params.row.status;
+        const showApprove = (status === 1 || status === 'Draft') && canApprove;
+        const showReceive = (status === 2 || status === 'Approved') && canOperate;
+        
+        if (!showApprove && !showReceive) {
+          return <Typography variant="caption" color="textSecondary">—</Typography>;
+        }
+
         return (
           <Stack direction="row" spacing={1} alignItems="center" height="100%">
-            {status === 1 && (
+            {showApprove && (
               <Tooltip title="Approve Order">
                 <IconButton color="success" size="small" onClick={() => handleApproveOrder(params.row.id)}>
                   <CheckCircleOutlined />
                 </IconButton>
               </Tooltip>
             )}
-            {status === 2 && (
+            {showReceive && (
               <Tooltip title="Receive Shipment">
                 <IconButton color="primary" size="small" onClick={() => handleReceiveOrder(params.row.id)}>
                   <ImportOutlined />
@@ -359,13 +376,15 @@ export default function PurchaseOrdersPage() {
             </Typography>
           </Grid>
           <Grid item>
-            <Button
-              variant="contained"
-              startIcon={<PlusOutlined />}
-              onClick={handleOpenAddDialog}
-            >
-              New Purchase Order
-            </Button>
+            {canOperate && (
+              <Button
+                variant="contained"
+                startIcon={<PlusOutlined />}
+                onClick={handleOpenAddDialog}
+              >
+                New Purchase Order
+              </Button>
+            )}
           </Grid>
         </Grid>
       </Box>
@@ -451,7 +470,7 @@ export default function PurchaseOrdersPage() {
                   ? 'No orders match your search criteria.'
                   : 'Create your first purchase order to get started.'}
               </Typography>
-              {!search && (
+              {!search && canOperate && (
                 <Button variant="contained" onClick={handleOpenAddDialog} startIcon={<PlusOutlined />}>
                   New Purchase Order
                 </Button>

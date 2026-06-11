@@ -23,8 +23,13 @@ import EditOutlined from '@ant-design/icons/EditOutlined';
 import DeleteOutlined from '@ant-design/icons/DeleteOutlined';
 import MainCard from 'components/MainCard';
 import { getProducts, createProduct, getCategories, updateProduct, deleteProduct } from 'api/products';
+import useAuth from 'hooks/useAuth';
 
 export default function ProductsPage() {
+  const { user } = useAuth();
+  const role = user?.role?.trim().toLowerCase();
+  const canWrite = role === 'admin' || role === 'manager';
+
   const [rows, setRows] = useState([]);
   const [totalRows, setTotalRows] = useState(0);
 
@@ -198,20 +203,26 @@ export default function ProductsPage() {
       sortable: false,
       renderCell: (params) => (
         <Stack direction="row" spacing={1} alignItems="center" height="100%">
-          <IconButton
-            color="primary"
-            size="small"
-            onClick={() => handleOpenEditDialog(params.row)}
-          >
-            <EditOutlined />
-          </IconButton>
-          <IconButton
-            color="error"
-            size="small"
-            onClick={() => handleOpenDeleteConfirm(params.row.id)}
-          >
-            <DeleteOutlined />
-          </IconButton>
+          {canWrite ? (
+            <>
+              <IconButton
+                color="primary"
+                size="small"
+                onClick={() => handleOpenEditDialog(params.row)}
+              >
+                <EditOutlined />
+              </IconButton>
+              <IconButton
+                color="error"
+                size="small"
+                onClick={() => handleOpenDeleteConfirm(params.row.id)}
+              >
+                <DeleteOutlined />
+              </IconButton>
+            </>
+          ) : (
+            <Typography variant="caption" color="textSecondary">Read-only</Typography>
+          )}
         </Stack>
       )
     }
@@ -225,9 +236,11 @@ export default function ProductsPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <Button variant="contained" onClick={handleOpenAddDialog}>
-          Add Product
-        </Button>
+        {canWrite && (
+          <Button variant="contained" onClick={handleOpenAddDialog}>
+            Add Product
+          </Button>
+        )}
       </Stack>
 
       <Box sx={{ height: 600 }}>

@@ -31,8 +31,13 @@ import {
   updateWarehouse,
   deleteWarehouse
 } from 'api/warehouses';
+import useAuth from 'hooks/useAuth';
 
 export default function WarehousesPage() {
+  const { user } = useAuth();
+  const role = user?.role?.trim().toLowerCase();
+  const canWrite = role === 'admin' || role === 'manager';
+
   const [warehouses, setWarehouses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
@@ -202,20 +207,26 @@ export default function WarehousesPage() {
       sortable: false,
       renderCell: (params) => (
         <Stack direction="row" spacing={1} alignItems="center" height="100%">
-          <IconButton
-            color="primary"
-            size="small"
-            onClick={() => handleOpenEditDialog(params.row)}
-          >
-            <EditOutlined />
-          </IconButton>
-          <IconButton
-            color="error"
-            size="small"
-            onClick={() => handleOpenDeleteConfirm(params.row)}
-          >
-            <DeleteOutlined />
-          </IconButton>
+          {canWrite ? (
+            <>
+              <IconButton
+                color="primary"
+                size="small"
+                onClick={() => handleOpenEditDialog(params.row)}
+              >
+                <EditOutlined />
+              </IconButton>
+              <IconButton
+                color="error"
+                size="small"
+                onClick={() => handleOpenDeleteConfirm(params.row)}
+              >
+                <DeleteOutlined />
+              </IconButton>
+            </>
+          ) : (
+            <Typography variant="caption" color="textSecondary">Read-only</Typography>
+          )}
         </Stack>
       )
     }
@@ -235,13 +246,15 @@ export default function WarehousesPage() {
             </Typography>
           </Grid>
           <Grid item>
-            <Button
-              variant="contained"
-              startIcon={<PlusOutlined />}
-              onClick={handleOpenAddDialog}
-            >
-              Add Warehouse
-            </Button>
+            {canWrite && (
+              <Button
+                variant="contained"
+                startIcon={<PlusOutlined />}
+                onClick={handleOpenAddDialog}
+              >
+                Add Warehouse
+              </Button>
+            )}
           </Grid>
         </Grid>
       </Box>
@@ -327,7 +340,7 @@ export default function WarehousesPage() {
                   ? 'No warehouses match your search criteria.'
                   : 'Create your first warehouse to get started.'}
               </Typography>
-              {!search && (
+              {!search && canWrite && (
                 <Button variant="contained" onClick={handleOpenAddDialog} startIcon={<PlusOutlined />}>
                   Create your first warehouse
                 </Button>
