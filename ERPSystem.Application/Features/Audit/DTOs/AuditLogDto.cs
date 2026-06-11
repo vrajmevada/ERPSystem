@@ -1,7 +1,8 @@
-﻿public record AuditLogDto(
+public record AuditLogDto(
     int Id,
     string UserName,
     string Action,
     string EntityName,
     int EntityId,
-    DateTime Timestamp);
+    DateTime Timestamp,
+    string? Changes);

@@ -1,4 +1,4 @@
-﻿namespace ERPSystem.Domain.Entities.Audit;
+namespace ERPSystem.Domain.Entities.Audit;
 
 public class AuditLog
 {
@@ -14,6 +14,8 @@ public class AuditLog
         = string.Empty;
 
     public int EntityId { get; set; }
+    
+    public string? Changes { get; set; }
 
     public DateTime Timestamp { get; set; }
         = DateTime.UtcNow;

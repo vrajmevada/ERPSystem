@@ -8,24 +8,28 @@ using ERPSystem.Application.Exceptions;
 using ERPSystem.Domain.Entities.Inventory;
 using Mapster;
 
+using ERPSystem.Application.Interfaces;
+
 namespace ERPSystem.Application.Features.Sales.Services;
 
 public class SalesOrderService
     : ISalesOrderService
 {
-    private readonly ISalesOrderRepository
-        _repository;
+    private readonly ISalesOrderRepository _repository;
     private readonly IStockItemRepository _stockItemRepository;
     private readonly IInventoryTransactionRepository _transactionRepository;
+    private readonly ITransactionManager _transactionManager;
 
     public SalesOrderService(
-    ISalesOrderRepository repository,
-    IStockItemRepository stockItemRepository,
-    IInventoryTransactionRepository transactionRepository)
+        ISalesOrderRepository repository,
+        IStockItemRepository stockItemRepository,
+        IInventoryTransactionRepository transactionRepository,
+        ITransactionManager transactionManager)
     {
         _repository = repository;
         _stockItemRepository = stockItemRepository;
         _transactionRepository = transactionRepository;
+        _transactionManager = transactionManager;
     }
 
     public async Task<PagedResult<SalesOrderDto>> GetAllAsync(
@@ -84,55 +88,65 @@ public class SalesOrderService
 
     public async Task ShipAsync(int id)
     {
-        var order = await _repository.GetByIdAsync(id);
-
-        if (order == null)
-            throw new BusinessException("Sales order not found.");
-
-        if (order.Status == SalesOrderStatus.Shipped)
-            throw new BusinessException(
-                "Sales order already shipped.");
-
-        var (stockItems, _) = await _stockItemRepository.GetAllAsync();
-
-        foreach (var item in order.Items)
+        using var tx = await _transactionManager.BeginTransactionAsync();
+        try
         {
-            var stockItem = stockItems.FirstOrDefault(s =>
-                s.ProductId == item.ProductId &&
-                s.WarehouseId == order.WarehouseId);
+            var order = await _repository.GetByIdAsync(id);
 
-            if (stockItem == null)
-                throw new BusinessException(
-                    $"No stock found for product {item.ProductId}.");
+            if (order == null)
+                throw new BusinessException("Sales order not found.");
 
-            if (stockItem.Quantity < item.Quantity)
+            if (order.Status == SalesOrderStatus.Shipped)
                 throw new BusinessException(
-                    $"Insufficient stock for product {item.ProductId}.");
-            if (order.Status != SalesOrderStatus.Confirmed)
+                    "Sales order already shipped.");
+
+            var (stockItems, _) = await _stockItemRepository.GetAllAsync();
+
+            foreach (var item in order.Items)
             {
-                throw new BusinessException(
-                    "Sales order must be confirmed before shipping.");
+                var stockItem = stockItems.FirstOrDefault(s =>
+                    s.ProductId == item.ProductId &&
+                    s.WarehouseId == order.WarehouseId);
+
+                if (stockItem == null)
+                    throw new BusinessException(
+                        $"No stock found for product {item.ProductId}.");
+
+                if (stockItem.Quantity < item.Quantity)
+                    throw new BusinessException(
+                        $"Insufficient stock for product {item.ProductId}.");
+                if (order.Status != SalesOrderStatus.Confirmed)
+                {
+                    throw new BusinessException(
+                        "Sales order must be confirmed before shipping.");
+                }
+
+                stockItem.Quantity -= item.Quantity;
+
+                await _stockItemRepository.UpdateAsync(stockItem);
+                
+
+                await _transactionRepository.AddAsync(
+                    new InventoryTransaction
+                    {
+                        StockItemId = stockItem.Id,
+                        QuantityChange = -item.Quantity,
+                        TransactionType = InventoryTransactionType.Sale,
+                        TransactionDate = DateTime.UtcNow
+                    });
             }
-
-            stockItem.Quantity -= item.Quantity;
-
-            await _stockItemRepository.UpdateAsync(stockItem);
             
 
-            await _transactionRepository.AddAsync(
-                new InventoryTransaction
-                {
-                    StockItemId = stockItem.Id,
-                    QuantityChange = -item.Quantity,
-                    TransactionType = InventoryTransactionType.Sale,
-                    TransactionDate = DateTime.UtcNow
-                });
+            order.Status = SalesOrderStatus.Shipped;
+
+            await _repository.UpdateAsync(order);
+            await _transactionManager.CommitAsync();
         }
-        
-
-        order.Status = SalesOrderStatus.Shipped;
-
-        await _repository.UpdateAsync(order);
+        catch
+        {
+            await _transactionManager.RollbackAsync();
+            throw;
+        }
     }
     public async Task ConfirmAsync(int id)
     {

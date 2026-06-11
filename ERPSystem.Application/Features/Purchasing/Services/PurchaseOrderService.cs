@@ -8,23 +8,28 @@ using ERPSystem.Domain.Entities.Inventory;
 using ERPSystem.Domain.Enums;
 using Mapster;
 
+using ERPSystem.Application.Interfaces;
+
 namespace ERPSystem.Application.Features.Purchasing.Services;
 
 public class PurchaseOrderService
     : IPurchaseOrderService
 {
-    private readonly IPurchaseOrderRepository
-        _repository;
+    private readonly IPurchaseOrderRepository _repository;
     private readonly IStockItemRepository _stockItemRepository;
     private readonly IInventoryTransactionRepository _transactionRepository;
+    private readonly ITransactionManager _transactionManager;
+
     public PurchaseOrderService(
-    IPurchaseOrderRepository repository,
-    IStockItemRepository stockItemRepository,
-    IInventoryTransactionRepository transactionRepository)
+        IPurchaseOrderRepository repository,
+        IStockItemRepository stockItemRepository,
+        IInventoryTransactionRepository transactionRepository,
+        ITransactionManager transactionManager)
     {
         _repository = repository;
         _stockItemRepository = stockItemRepository;
         _transactionRepository = transactionRepository;
+        _transactionManager = transactionManager;
     }
 
     public async Task<PagedResult<PurchaseOrderDto>> GetAllAsync(
@@ -57,58 +62,68 @@ public class PurchaseOrderService
     }
     public async Task ReceiveAsync(int id)
     {
-        var order = await _repository.GetByIdAsync(id);
-
-        if (order == null)
-            throw new BusinessException("Purchase order not found.");
-
-        if (order.Status == PurchaseOrderStatus.Received)
-            throw new BusinessException("Purchase order already received.");
-        if (order.Status != PurchaseOrderStatus.Approved)
+        using var tx = await _transactionManager.BeginTransactionAsync();
+        try
         {
-            throw new BusinessException(
-                "Purchase order must be approved before receiving.");
-        }
+            var order = await _repository.GetByIdAsync(id);
 
-        var (stockItems, _) = await _stockItemRepository.GetAllAsync();
+            if (order == null)
+                throw new BusinessException("Purchase order not found.");
 
-        foreach (var item in order.Items)
-        {
-            var stockItem = stockItems.FirstOrDefault(s =>
-                s.ProductId == item.ProductId &&
-                s.WarehouseId == order.WarehouseId);
-
-            if (stockItem == null)
+            if (order.Status == PurchaseOrderStatus.Received)
+                throw new BusinessException("Purchase order already received.");
+            if (order.Status != PurchaseOrderStatus.Approved)
             {
-                stockItem = new StockItem
-                {
-                    ProductId = item.ProductId,
-                    WarehouseId = order.WarehouseId,
-                    Quantity = item.Quantity
-                };
-
-                await _stockItemRepository.AddAsync(stockItem);
-            }
-            else
-            {
-                stockItem.Quantity += item.Quantity;
-
-                await _stockItemRepository.UpdateAsync(stockItem);
+                throw new BusinessException(
+                    "Purchase order must be approved before receiving.");
             }
 
-            await _transactionRepository.AddAsync(
-                new InventoryTransaction
+            var (stockItems, _) = await _stockItemRepository.GetAllAsync();
+
+            foreach (var item in order.Items)
+            {
+                var stockItem = stockItems.FirstOrDefault(s =>
+                    s.ProductId == item.ProductId &&
+                    s.WarehouseId == order.WarehouseId);
+
+                if (stockItem == null)
                 {
-                    StockItemId = stockItem.Id,
-                    QuantityChange = item.Quantity,
-                    TransactionType = InventoryTransactionType.Purchase,
-                    TransactionDate = DateTime.UtcNow
-                });
+                    stockItem = new StockItem
+                    {
+                        ProductId = item.ProductId,
+                        WarehouseId = order.WarehouseId,
+                        Quantity = item.Quantity
+                    };
+
+                    await _stockItemRepository.AddAsync(stockItem);
+                }
+                else
+                {
+                    stockItem.Quantity += item.Quantity;
+
+                    await _stockItemRepository.UpdateAsync(stockItem);
+                }
+
+                await _transactionRepository.AddAsync(
+                    new InventoryTransaction
+                    {
+                        StockItemId = stockItem.Id,
+                        QuantityChange = item.Quantity,
+                        TransactionType = InventoryTransactionType.Purchase,
+                        TransactionDate = DateTime.UtcNow
+                    });
+            }
+
+            order.Status = PurchaseOrderStatus.Received;
+
+            await _repository.UpdateAsync(order);
+            await _transactionManager.CommitAsync();
         }
-
-        order.Status = PurchaseOrderStatus.Received;
-
-        await _repository.UpdateAsync(order);
+        catch
+        {
+            await _transactionManager.RollbackAsync();
+            throw;
+        }
     }
     public async Task ApproveAsync(int id)
     {

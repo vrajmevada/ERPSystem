@@ -9,11 +9,24 @@ import {
   Grid,
   Typography,
   Chip,
-  IconButton
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TableContainer,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Paper
 } from '@mui/material';
 import HistoryOutlined from '@ant-design/icons/HistoryOutlined';
 import SearchOutlined from '@ant-design/icons/SearchOutlined';
 import CloseOutlined from '@ant-design/icons/CloseOutlined';
+import EyeOutlined from '@ant-design/icons/EyeOutlined';
 
 import MainCard from 'components/MainCard';
 import { getAuditLogs } from 'api/auditLogs';
@@ -59,6 +72,49 @@ const getActionChipProps = (action) => {
   return { label: action, color: 'default', variant: 'outlined' };
 };
 
+// Parse Changes JSON for before/after display
+const parseChanges = (changes, action) => {
+  if (!changes) return null;
+  try {
+    const data = JSON.parse(changes);
+
+    // If it's update/edit action
+    const actionLower = action?.toLowerCase() || '';
+    if (actionLower.includes('update') || actionLower.includes('edit')) {
+      const diffs = [];
+      for (const [key, value] of Object.entries(data)) {
+        if (value && typeof value === 'object' && ('old' in value || 'new' in value)) {
+          diffs.push({
+            field: key,
+            oldValue: value.old === null || value.old === undefined ? '(null)' : String(value.old),
+            newValue: value.new === null || value.new === undefined ? '(null)' : String(value.new)
+          });
+        } else {
+          diffs.push({
+            field: key,
+            oldValue: 'Unknown',
+            newValue: String(value)
+          });
+        }
+      }
+      return { type: 'update', diffs };
+    }
+
+    // Otherwise it's flat key-value pairs (added or deleted)
+    const fields = [];
+    for (const [key, value] of Object.entries(data)) {
+      fields.push({
+        field: key,
+        value: value === null || value === undefined ? '(null)' : String(value)
+      });
+    }
+    return { type: actionLower.includes('delete') || actionLower.includes('remove') ? 'delete' : 'create', fields };
+  } catch (e) {
+    console.error('Failed to parse changes:', e);
+    return { type: 'raw', raw: changes };
+  }
+};
+
 export default function AuditLogsPage() {
   const [rows, setRows] = useState([]);
   const [totalRows, setTotalRows] = useState(0);
@@ -69,6 +125,10 @@ export default function AuditLogsPage() {
   const [pageSize, setPageSize] = useState(10);
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search, 300);
+
+  // Details Modal State
+  const [selectedLog, setSelectedLog] = useState(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
 
   // Snackbar notifications state
   const [snackbar, setSnackbar] = useState({
@@ -108,6 +168,16 @@ export default function AuditLogsPage() {
     setSnackbar((prev) => ({ ...prev, open: false }));
   };
 
+  const handleOpenDetails = (log) => {
+    setSelectedLog(log);
+    setDetailsOpen(true);
+  };
+
+  const handleCloseDetails = () => {
+    setDetailsOpen(false);
+    setSelectedLog(null);
+  };
+
   const columns = [
     { field: 'id', headerName: 'ID', width: 80 },
     { field: 'userName', headerName: 'User', flex: 1.2 },
@@ -127,6 +197,26 @@ export default function AuditLogsPage() {
       headerName: 'Timestamp',
       flex: 1.5,
       valueFormatter: (value) => value ? new Date(value).toLocaleString() : ''
+    },
+    {
+      field: 'changes',
+      headerName: 'Details',
+      width: 130,
+      sortable: false,
+      renderCell: (params) => {
+        return (
+          <Button
+            size="small"
+            variant="outlined"
+            color="primary"
+            startIcon={<EyeOutlined />}
+            onClick={() => handleOpenDetails(params.row)}
+            sx={{ py: 0.25 }}
+          >
+            View Diff
+          </Button>
+        );
+      }
     }
   ];
 
@@ -140,7 +230,7 @@ export default function AuditLogsPage() {
               Audit Logs
             </Typography>
             <Typography variant="body1" color="textSecondary">
-              Trace and monitor security events, administrative changes, and transaction actions
+              Trace and monitor security events, administrative changes, and transaction actions with before/after state details
             </Typography>
           </Grid>
         </Grid>
@@ -249,6 +339,134 @@ export default function AuditLogsPage() {
           )}
         </Box>
       </MainCard>
+
+      {/* Details Dialog */}
+      <Dialog
+        open={detailsOpen}
+        onClose={handleCloseDetails}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle sx={{ pb: 1, borderBottom: '1px solid #f0f0f0' }}>
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <HistoryOutlined style={{ fontSize: '20px', color: '#1890ff' }} />
+            <Typography variant="h4">Audit Log Details - Event #{selectedLog?.id}</Typography>
+          </Stack>
+        </DialogTitle>
+        <DialogContent sx={{ p: 3 }}>
+          {selectedLog && (
+            <Grid container spacing={3}>
+              {/* Event Info Metadata */}
+              <Grid item xs={12} md={4}>
+                <Typography variant="h5" sx={{ mb: 2 }}>Event Information</Typography>
+                <Stack spacing={1.5}>
+                  <Box>
+                    <Typography variant="caption" color="textSecondary" display="block">OPERATING USER</Typography>
+                    <Typography variant="body1" fontWeight="600">{selectedLog.userName}</Typography>
+                  </Box>
+                  <Box>
+                    <Typography variant="caption" color="textSecondary" display="block">ACTION TYPE</Typography>
+                    <Chip size="small" {...getActionChipProps(selectedLog.action)} />
+                  </Box>
+                  <Box>
+                    <Typography variant="caption" color="textSecondary" display="block">AFFECTED ENTITY</Typography>
+                    <Typography variant="body1" fontWeight="600">{selectedLog.entityName} (ID: {selectedLog.entityId})</Typography>
+                  </Box>
+                  <Box>
+                    <Typography variant="caption" color="textSecondary" display="block">TIMESTAMP</Typography>
+                    <Typography variant="body1">{new Date(selectedLog.timestamp).toLocaleString()}</Typography>
+                  </Box>
+                </Stack>
+              </Grid>
+
+              {/* Before/After Changes Diff View */}
+              <Grid item xs={12} md={8} sx={{ borderLeft: { md: '1px solid #f0f0f0' }, pl: { md: 3 } }}>
+                <Typography variant="h5" sx={{ mb: 2 }}>Changes & State Differences</Typography>
+                {(() => {
+                  const parsed = parseChanges(selectedLog.changes, selectedLog.action);
+                  if (!parsed) {
+                    return (
+                      <Box sx={{ py: 4, textAlign: 'center', bgcolor: 'grey.50', borderRadius: 1 }}>
+                        <Typography color="textSecondary">No detailed state changes recorded for this event.</Typography>
+                      </Box>
+                    );
+                  }
+
+                  if (parsed.type === 'raw') {
+                    return (
+                      <Paper variant="outlined" sx={{ p: 2, bgcolor: 'grey.50', fontFamily: 'monospace', fontSize: '13px', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+                        {parsed.raw}
+                      </Paper>
+                    );
+                  }
+
+                  if (parsed.type === 'update') {
+                    return (
+                      <TableContainer component={Paper} variant="outlined">
+                        <Table size="small">
+                          <TableHead sx={{ bgcolor: 'grey.50' }}>
+                            <TableRow>
+                              <TableCell sx={{ fontWeight: 'bold' }}>Field</TableCell>
+                              <TableCell sx={{ fontWeight: 'bold' }}>Original Value</TableCell>
+                              <TableCell sx={{ fontWeight: 'bold' }}>New Value</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {parsed.diffs.map((diff, index) => (
+                              <TableRow key={index} hover>
+                                <TableCell sx={{ fontWeight: 'medium', fontFamily: 'monospace' }}>{diff.field}</TableCell>
+                                <TableCell sx={{ bgcolor: '#fff1f0', color: '#cf1322', fontFamily: 'monospace' }}>
+                                  <span style={{ textDecoration: 'line-through' }}>{diff.oldValue}</span>
+                                </TableCell>
+                                <TableCell sx={{ bgcolor: '#f6ffed', color: '#389e0d', fontFamily: 'monospace', fontWeight: 'bold' }}>
+                                  {diff.newValue}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    );
+                  }
+
+                  // create or delete
+                  return (
+                    <TableContainer component={Paper} variant="outlined">
+                      <Table size="small">
+                        <TableHead sx={{ bgcolor: 'grey.50' }}>
+                          <TableRow>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Field</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>{parsed.type === 'create' ? 'Initialized Value' : 'Deleted Value'}</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {parsed.fields.map((f, index) => (
+                            <TableRow key={index} hover>
+                              <TableCell sx={{ fontWeight: 'medium', fontFamily: 'monospace' }}>{f.field}</TableCell>
+                              <TableCell sx={{ 
+                                bgcolor: parsed.type === 'create' ? '#f6ffed' : '#fff1f0', 
+                                color: parsed.type === 'create' ? '#389e0d' : '#cf1322',
+                                fontFamily: 'monospace' 
+                              }}>
+                                {f.value}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  );
+                })()}
+              </Grid>
+            </Grid>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ p: 2, borderTop: '1px solid #f0f0f0' }}>
+          <Button onClick={handleCloseDetails} variant="contained" color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Snackbar Alert Notifications */}
       <Snackbar

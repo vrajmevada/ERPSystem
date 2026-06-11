@@ -23,6 +23,8 @@ using ERPSystem.Application.Interfaces.Sales;
 using ERPSystem.Application.Security;
 using ERPSystem.Domain.Entities.Identity;
 using ERPSystem.Persistence.Context;
+using ERPSystem.Persistence.Transactions;
+using ERPSystem.Application.Interfaces;
 using ERPSystem.Persistence.Repositories;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -71,6 +73,7 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 builder.Services.AddProblemDetails();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -127,6 +130,9 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     IAuditService,
     AuditService>();
+builder.Services.AddScoped<
+    ITransactionManager,
+    TransactionManager>();
 builder.Services.AddScoped<
     IReportRepository,
     ReportRepository>();
