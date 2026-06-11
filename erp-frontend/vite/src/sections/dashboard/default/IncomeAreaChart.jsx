@@ -49,8 +49,8 @@ export default function IncomeAreaChart({ view }) {
   const theme = useTheme();
 
   const [visibility, setVisibility] = useState({
-    'Page views': true,
-    Sessions: true
+    'Sales Orders': true,
+    'Purchase Orders': true
   });
 
   const labels = view === 'monthly' ? monthlyLabels : weeklyLabels;
@@ -66,21 +66,21 @@ export default function IncomeAreaChart({ view }) {
   const visibleSeries = [
     {
       data: data1,
-      label: 'Page views',
+      label: 'Sales Orders',
       showMark: false,
       area: true,
-      id: 'page-views',
+      id: 'sales-orders',
       color: theme.vars.palette.primary.main || '',
-      visible: visibility['Page views']
+      visible: visibility['Sales Orders']
     },
     {
       data: data2,
-      label: 'Sessions',
+      label: 'Purchase Orders',
       showMark: false,
       area: true,
-      id: 'sessions',
+      id: 'purchase-orders',
       color: theme.vars.palette.primary[700] || '',
-      visible: visibility['Sessions']
+      visible: visibility['Purchase Orders']
     }
   ];
 
@@ -109,8 +109,8 @@ export default function IncomeAreaChart({ view }) {
         sx={{
           [`& .${chartsGridClasses.line}`]: { strokeDasharray: '4 4', stroke: line },
           [`& .${lineClasses.area}`]: {
-            '&[data-series-id="page-views"]': { fill: "url('#myGradient1')", strokeWidth: 2, opacity: 0.8 },
-            '&[data-series-id="sessions"]': { fill: "url('#myGradient2')", strokeWidth: 2, opacity: 0.8 }
+            '&[data-series-id="sales-orders"]': { fill: "url('#myGradient1')", strokeWidth: 2, opacity: 0.8 },
+            '&[data-series-id="purchase-orders"]': { fill: "url('#myGradient2')", strokeWidth: 2, opacity: 0.8 }
           },
           [`& .${axisClasses.root}.${axisClasses.directionX} .${axisClasses.tick}`]: { stroke: 'transparent' },
           [`& .${axisClasses.root}.${axisClasses.directionY} .${axisClasses.tick}`]: { stroke: 'transparent' }

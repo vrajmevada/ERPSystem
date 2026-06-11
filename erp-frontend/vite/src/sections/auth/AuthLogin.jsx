@@ -172,7 +172,23 @@ export default function AuthLogin({ isDemo = false }) {
               fullWidth
               size="large"
               variant="contained"
-              color="primary"
+              sx={{
+                background: 'linear-gradient(135deg, #1677ff 0%, #0958d9 100%)',
+                borderRadius: '10px',
+                fontWeight: 'bold',
+                textTransform: 'none',
+                fontSize: '16px',
+                boxShadow: '0 4px 12px rgba(22, 119, 255, 0.25)',
+                transition: 'all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1)',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #4096ff 0%, #0958d9 100%)',
+                  boxShadow: '0 6px 20px rgba(22, 119, 255, 0.4)',
+                  transform: 'translateY(-1.5px)'
+                },
+                '&:active': {
+                  transform: 'translateY(0.5px)'
+                }
+              }}
             >
               Login
             </Button>

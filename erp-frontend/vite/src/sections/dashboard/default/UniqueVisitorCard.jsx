@@ -20,7 +20,7 @@ export default function UniqueVisitorCard() {
     <>
       <Grid container sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
         <Grid>
-          <Typography variant="h5">Unique Visitor</Typography>
+          <Typography variant="h5">Sales & Purchase Trends</Typography>
         </Grid>
         <Grid>
           <Stack direction="row" sx={{ alignItems: 'center' }}>
