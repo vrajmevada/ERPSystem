@@ -590,6 +590,19 @@
     reselect "^5.1.1"
     use-sync-external-store "^1.6.0"
 
+"@mui/x-data-grid@^9.4.0":
+  version "9.4.0"
+  resolved "https://registry.npmjs.org/@mui/x-data-grid/-/x-data-grid-9.4.0.tgz"
+  integrity sha512-SE2m19Uvmm50ehXbyhxI4HMqH4V+v70mnd/H7EhVzgBKSQAGoBMneK5tQhcbEDZ28a9zu7FIinaVyulCO/mTaQ==
+  dependencies:
+    "@babel/runtime" "^7.29.7"
+    "@mui/utils" "9.0.1"
+    "@mui/x-internals" "^9.1.0"
+    "@mui/x-virtualizer" "9.0.0-alpha.8"
+    clsx "^2.1.1"
+    prop-types "^15.8.1"
+    use-sync-external-store "^1.6.0"
+
 "@mui/x-internal-gestures@^9.2.0":
   version "9.3.0"
   resolved "https://registry.npmjs.org/@mui/x-internal-gestures/-/x-internal-gestures-9.3.0.tgz"
@@ -606,6 +619,15 @@
     "@mui/utils" "9.0.0"
     reselect "^5.1.1"
     use-sync-external-store "^1.6.0"
+
+"@mui/x-virtualizer@9.0.0-alpha.8":
+  version "9.0.0-alpha.8"
+  resolved "https://registry.npmjs.org/@mui/x-virtualizer/-/x-virtualizer-9.0.0-alpha.8.tgz"
+  integrity sha512-Bfvj2Zhi68rkJ/p99UAWqqTgRWvyTOIyzglagtfSaibrNwDmwN2cwfwLmSd2XrWmpirNY39kCxzqoURmacMutA==
+  dependencies:
+    "@babel/runtime" "^7.29.7"
+    "@mui/utils" "9.0.1"
+    "@mui/x-internals" "^9.1.0"
 
 "@oxc-project/types@=0.130.0":
   version "0.130.0"

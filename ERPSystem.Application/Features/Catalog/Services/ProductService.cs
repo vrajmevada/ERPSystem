@@ -57,4 +57,33 @@ public class ProductService : IProductService
 
         return product.Adapt<ProductDto>();
     }
+
+    public async Task<ProductDto?> UpdateAsync(
+     int id,
+     UpdateProductDto dto)
+    {
+        var product =
+            await _repository.GetByIdAsync(id);
+
+        if (product == null)
+            return null;
+
+        dto.Adapt(product);
+
+        await _repository.UpdateAsync(product);
+
+        return product.Adapt<ProductDto>();
+    }
+
+    public async Task DeleteAsync(int id)
+    {
+        var product =
+            await _repository.GetByIdAsync(id);
+
+        if (product == null)
+            throw new KeyNotFoundException(
+                $"Product {id} not found");
+
+        await _repository.DeleteAsync(product);
+    }
 }

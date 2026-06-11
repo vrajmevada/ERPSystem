@@ -55,4 +55,26 @@ public class ProductsController : ControllerBase
 
         return Ok(result);
     }
+    [HttpPut("{id}")]
+    [Authorize(Policy = AppPolicies.MasterDataWrite)]
+    public async Task<ActionResult<ProductDto>> Update(
+    int id,
+    [FromBody] UpdateProductDto dto)
+    {
+        var result =
+            await _service.UpdateAsync(id, dto);
+
+        if (result == null)
+            return NotFound();
+
+        return Ok(result);
+    }
+    [HttpDelete("{id}")]
+    [Authorize(Policy = AppPolicies.MasterDataWrite)]
+    public async Task<IActionResult> Delete(int id)
+    {
+        await _service.DeleteAsync(id);
+
+        return NoContent();
+    }
 }

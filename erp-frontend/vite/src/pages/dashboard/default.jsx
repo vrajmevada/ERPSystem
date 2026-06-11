@@ -3,7 +3,8 @@ import { useEffect } from 'react';
 import {
   getSalesSummary,
   getPurchaseSummary,
-  getInventorySummary
+  getInventorySummary,
+  getLowStock
 } from 'api/dashboard';
 import Alert from '@mui/material/Alert';
 // material-ui
@@ -30,7 +31,7 @@ import MonthlyBarChart from 'sections/dashboard/default/MonthlyBarChart';
 import ReportAreaChart from 'sections/dashboard/default/ReportAreaChart';
 import UniqueVisitorCard from 'sections/dashboard/default/UniqueVisitorCard';
 import SaleReportCard from 'sections/dashboard/default/SaleReportCard';
-import OrdersTable from 'sections/dashboard/default/OrdersTable';
+
 
 // assets
 import EllipsisOutlined from '@ant-design/icons/EllipsisOutlined';
@@ -67,6 +68,7 @@ export default function DashboardDefault() {
   const [purchaseSummary, setPurchaseSummary] = useState(null);
   const [inventorySummary, setInventorySummary] = useState(null);
   const [error, setError] = useState(null);
+  const [lowStockItems, setLowStockItems] = useState([]);
 
   useEffect(() => {
     const loadDashboard = async () => {
@@ -75,7 +77,9 @@ export default function DashboardDefault() {
         const sales = await getSalesSummary();
         const purchases = await getPurchaseSummary();
         const inventory = await getInventorySummary();
+        const lowStock = await getLowStock();
 
+        setLowStockItems(lowStock);
         setSalesSummary(sales);
         setPurchaseSummary(purchases);
         setInventorySummary(inventory);
@@ -87,15 +91,7 @@ export default function DashboardDefault() {
 
     loadDashboard();
   }, []);
-  const [orderMenuAnchor, setOrderMenuAnchor] = useState(null);
   const [analyticsMenuAnchor, setAnalyticsMenuAnchor] = useState(null);
-
-  const handleOrderMenuClick = (event) => {
-    setOrderMenuAnchor(event.currentTarget);
-  };
-  const handleOrderMenuClose = () => {
-    setOrderMenuAnchor(null);
-  };
 
   const handleAnalyticsMenuClick = (event) => {
     setAnalyticsMenuAnchor(event.currentTarget);
@@ -165,32 +161,32 @@ export default function DashboardDefault() {
       </Grid>
       {/* row 3 */}
       <Grid size={{ xs: 12, md: 7, lg: 8 }}>
-        <Grid container sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
-          <Grid>
-            <Typography variant="h5">Recent Orders</Typography>
-          </Grid>
-          <Grid>
-            <IconButton onClick={handleOrderMenuClick}>
-              <EllipsisOutlined style={{ fontSize: '1.25rem' }} />
-            </IconButton>
-            <Menu
-              id="fade-menu"
-              slotProps={{ list: { 'aria-labelledby': 'fade-button' } }}
-              anchorEl={orderMenuAnchor}
-              onClose={handleOrderMenuClose}
-              open={Boolean(orderMenuAnchor)}
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-              transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-            >
-              <MenuItem onClick={handleOrderMenuClose}>Export as CSV</MenuItem>
-              <MenuItem onClick={handleOrderMenuClose}>Export as Excel</MenuItem>
-              <MenuItem onClick={handleOrderMenuClose}>Print Table</MenuItem>
-            </Menu>
-          </Grid>
-        </Grid>
-        <MainCard sx={{ mt: 2 }} content={false}>
-          <OrdersTable />
-        </MainCard>
+      <MainCard title="Low Stock Items">
+        <table
+          style={{
+            width: '100%',
+            borderCollapse: 'collapse'
+          }}
+        >
+          <thead>
+            <tr>
+              <th align="left">Product</th>
+              <th align="left">Warehouse</th>
+              <th align="left">Quantity</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {lowStockItems.map((item) => (
+              <tr key={item.productId}>
+                <td>{item.productName}</td>
+                <td>{item.warehouseName}</td>
+                <td>{item.quantity}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </MainCard>
       </Grid>
       <Grid size={{ xs: 12, md: 5, lg: 4 }}>
         <Grid container sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
