@@ -20,3 +20,13 @@ export const getCategories = async () => {
   const response = await axiosServices.get('/categories');
   return response.data;
 };
+export const updateProduct = async (id, product) => {
+  const response = await axiosServices.put(`/products/${id}`, product);
+  return response.data;
+};
+
+export const deleteProduct = async (id) => {
+  const response = await axiosServices.delete(`/products/${id}`);
+  return response.data;
+};
+

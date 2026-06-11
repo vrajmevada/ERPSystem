@@ -3,21 +3,26 @@ import { DataGrid } from '@mui/x-data-grid';
 import {
   Box,
   Button,
+  IconButton,
   TextField,
   Stack,
   Dialog,
   DialogTitle,
   DialogContent,
+  DialogContentText,
   DialogActions,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
   Alert,
-  FormHelperText
+  FormHelperText,
+  Typography
 } from '@mui/material';
+import EditOutlined from '@ant-design/icons/EditOutlined';
+import DeleteOutlined from '@ant-design/icons/DeleteOutlined';
 import MainCard from 'components/MainCard';
-import { getProducts, createProduct, getCategories } from 'api/products';
+import { getProducts, createProduct, getCategories, updateProduct, deleteProduct } from 'api/products';
 
 export default function ProductsPage() {
   const [rows, setRows] = useState([]);
@@ -35,6 +40,12 @@ export default function ProductsPage() {
   const [categoryId, setCategoryId] = useState('');
   const [submitError, setSubmitError] = useState('');
   const [fieldErrors, setFieldErrors] = useState({});
+  const [editProductId, setEditProductId] = useState(null);
+
+  // Delete Dialog states
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [productIdToDelete, setProductIdToDelete] = useState(null);
+  const [deleteError, setDeleteError] = useState('');
 
   useEffect(() => {
     loadProducts();
@@ -63,10 +74,21 @@ export default function ProductsPage() {
     }
   };
 
-  const handleOpenDialog = () => {
+  const handleOpenAddDialog = () => {
+    setEditProductId(null);
     setName('');
     setPrice('');
     setCategoryId('');
+    setSubmitError('');
+    setFieldErrors({});
+    setOpen(true);
+  };
+
+  const handleOpenEditDialog = (product) => {
+    setEditProductId(product.id);
+    setName(product.name);
+    setPrice(product.price.toString());
+    setCategoryId(product.categoryId || '');
     setSubmitError('');
     setFieldErrors({});
     setOpen(true);
@@ -99,16 +121,22 @@ export default function ProductsPage() {
     return Object.keys(errors).length === 0;
   };
 
-  const handleCreateProduct = async () => {
+  const handleSaveProduct = async () => {
     if (!validateForm()) return;
 
     try {
       setSubmitError('');
-      await createProduct({
+      const productData = {
         name: name.trim(),
         price: parseFloat(price),
         categoryId: parseInt(categoryId, 10)
-      });
+      };
+
+      if (editProductId) {
+        await updateProduct(editProductId, productData);
+      } else {
+        await createProduct(productData);
+      }
       setOpen(false);
       loadProducts();
     } catch (error) {
@@ -117,7 +145,38 @@ export default function ProductsPage() {
         error.response?.data?.message ||
         error.response?.data ||
         error.message ||
-        'Failed to add product'
+        `Failed to ${editProductId ? 'update' : 'add'} product`
+      );
+    }
+  };
+
+  const handleOpenDeleteConfirm = (id) => {
+    setProductIdToDelete(id);
+    setDeleteError('');
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleCloseDeleteConfirm = () => {
+    setDeleteConfirmOpen(false);
+    setProductIdToDelete(null);
+    setDeleteError('');
+  };
+
+  const handleDeleteProduct = async () => {
+    if (!productIdToDelete) return;
+    try {
+      setDeleteError('');
+      await deleteProduct(productIdToDelete);
+      setDeleteConfirmOpen(false);
+      setProductIdToDelete(null);
+      loadProducts();
+    } catch (error) {
+      console.error(error);
+      setDeleteError(
+        error.response?.data?.message ||
+        error.response?.data ||
+        error.message ||
+        'Failed to delete product'
       );
     }
   };
@@ -131,7 +190,31 @@ export default function ProductsPage() {
       width: 150, 
       valueFormatter: (value) => (value !== undefined && value !== null ? `$${Number(value).toFixed(2)}` : '') 
     },
-    { field: 'categoryName', headerName: 'Category', flex: 1 }
+    { field: 'categoryName', headerName: 'Category', flex: 1 },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 120,
+      sortable: false,
+      renderCell: (params) => (
+        <Stack direction="row" spacing={1} alignItems="center" height="100%">
+          <IconButton
+            color="primary"
+            size="small"
+            onClick={() => handleOpenEditDialog(params.row)}
+          >
+            <EditOutlined />
+          </IconButton>
+          <IconButton
+            color="error"
+            size="small"
+            onClick={() => handleOpenDeleteConfirm(params.row.id)}
+          >
+            <DeleteOutlined />
+          </IconButton>
+        </Stack>
+      )
+    }
   ];
 
   return (
@@ -142,7 +225,7 @@ export default function ProductsPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <Button variant="contained" onClick={handleOpenDialog}>
+        <Button variant="contained" onClick={handleOpenAddDialog}>
           Add Product
         </Button>
       </Stack>
@@ -164,9 +247,9 @@ export default function ProductsPage() {
         />
       </Box>
 
-      {/* Add Product Dialog */}
+      {/* Add/Edit Product Dialog */}
       <Dialog open={open} onClose={handleCloseDialog} maxWidth="xs" fullWidth>
-        <DialogTitle>Add New Product</DialogTitle>
+        <DialogTitle>{editProductId ? 'Edit Product' : 'Add New Product'}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
             {submitError && <Alert severity="error">{submitError}</Alert>}
@@ -212,8 +295,27 @@ export default function ProductsPage() {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog}>Cancel</Button>
-          <Button onClick={handleCreateProduct} variant="contained">
-            Add
+          <Button onClick={handleSaveProduct} variant="contained">
+            {editProductId ? 'Save' : 'Add'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteConfirmOpen} onClose={handleCloseDeleteConfirm} maxWidth="xs" fullWidth>
+        <DialogTitle>Delete Product</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2} sx={{ mt: 1 }}>
+            {deleteError && <Alert severity="error">{deleteError}</Alert>}
+            <DialogContentText>
+              Are you sure you want to delete this product? This action cannot be undone.
+            </DialogContentText>
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteConfirm}>Cancel</Button>
+          <Button onClick={handleDeleteProduct} color="error" variant="contained">
+            Delete
           </Button>
         </DialogActions>
       </Dialog>

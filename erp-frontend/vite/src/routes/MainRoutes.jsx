@@ -10,6 +10,16 @@ const DashboardDefault = Loadable(lazy(() => import('pages/dashboard/default')))
 const ProductsPage = Loadable(
   lazy(() => import('pages/products/ProductsPage'))
 );
+
+// render - placeholders
+const CategoriesPage = Loadable(lazy(() => import('pages/placeholder/CategoriesPage')));
+const CustomersPage = Loadable(lazy(() => import('pages/placeholder/CustomersPage')));
+const SuppliersPage = Loadable(lazy(() => import('pages/placeholder/SuppliersPage')));
+const WarehousesPage = Loadable(lazy(() => import('pages/placeholder/WarehousesPage')));
+const TransactionsPage = Loadable(lazy(() => import('pages/placeholder/TransactionsPage')));
+const PurchaseOrdersPage = Loadable(lazy(() => import('pages/placeholder/PurchaseOrdersPage')));
+const SalesOrdersPage = Loadable(lazy(() => import('pages/placeholder/SalesOrdersPage')));
+
 // render - color
 const Color = Loadable(lazy(() => import('pages/component-overview/color')));
 const Typography = Loadable(lazy(() => import('pages/component-overview/typography')));
@@ -35,7 +45,6 @@ const MainRoutes = {
     {
       path: 'dashboard',
       children: [
-        
         {
           path: 'default',
           element: <DashboardDefault />
@@ -45,6 +54,34 @@ const MainRoutes = {
     {
       path: 'products',
       element: <ProductsPage/>
+    },
+    {
+      path: 'categories',
+      element: <CategoriesPage />
+    },
+    {
+      path: 'customers',
+      element: <CustomersPage />
+    },
+    {
+      path: 'suppliers',
+      element: <SuppliersPage />
+    },
+    {
+      path: 'warehouses',
+      element: <WarehousesPage />
+    },
+    {
+      path: 'transactions',
+      element: <TransactionsPage />
+    },
+    {
+      path: 'purchase-orders',
+      element: <PurchaseOrdersPage />
+    },
+    {
+      path: 'sales-orders',
+      element: <SalesOrdersPage />
     },
     {
       path: 'typography',
