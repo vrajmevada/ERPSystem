@@ -242,7 +242,12 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
 app.MapControllers();
+app.MapFallbackToFile("index.html");
+
 Console.WriteLine(
     builder.Configuration.GetConnectionString("DefaultConnection"));
 app.Run();

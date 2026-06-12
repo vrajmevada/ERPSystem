@@ -108,30 +108,7 @@ export default function AuthRegister() {
                 )}
               </Grid>
 
-              <Grid size={12}>
-                <Stack sx={{ gap: 1 }}>
-                  <InputLabel htmlFor="role-signup">Role*</InputLabel>
-                  <Select
-                    id="role-signup"
-                    value={values.role}
-                    name="role"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    fullWidth
-                    error={Boolean(touched.role && errors.role)}
-                  >
-                    <MenuItem value="Admin">Admin</MenuItem>
-                    <MenuItem value="Manager">Manager</MenuItem>
-                    <MenuItem value="Operator">Operator</MenuItem>
-                    <MenuItem value="Viewer">Viewer</MenuItem>
-                  </Select>
-                </Stack>
-                {touched.role && errors.role && (
-                  <FormHelperText error id="helper-text-role-signup">
-                    {errors.role}
-                  </FormHelperText>
-                )}
-              </Grid>
+
 
               <Grid size={12}>
                 <Stack sx={{ gap: 1 }}>

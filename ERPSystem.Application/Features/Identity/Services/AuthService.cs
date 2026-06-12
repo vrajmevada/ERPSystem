@@ -1,4 +1,4 @@
-﻿using ERPSystem.Application.Exceptions;
+using ERPSystem.Application.Exceptions;
 using ERPSystem.Application.Features.Identity.DTOs;
 using ERPSystem.Application.Interfaces.Identity;
 using ERPSystem.Application.Security;
@@ -41,7 +41,7 @@ public class AuthService : IAuthService
             Username = dto.Username,
             PasswordHash =
                 PasswordHasher.Hash(dto.Password),
-            Role = dto.Role
+            Role = "Viewer" // Enforce 'Viewer' role for all self-registrations for security
         };
 
         await _userRepository.AddAsync(user);
