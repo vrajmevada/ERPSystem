@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom';
 
 // material-ui
 import List from '@mui/material/List';
@@ -15,35 +16,45 @@ import WalletOutlined from '@ant-design/icons/WalletOutlined';
 
 // ==============================|| HEADER PROFILE - PROFILE TAB ||============================== //
 
-export default function ProfileTab({ handleLogout }) {
+export default function ProfileTab({ handleLogout, onClose }) {
+  const navigate = useNavigate();
+
+  const handleNavigate = (path) => {
+    navigate(path);
+    if (onClose) onClose();
+  };
+
   return (
     <List component="nav" sx={{ p: 0, '& .MuiListItemIcon-root': { minWidth: 32 } }}>
-      <ListItemButton>
+      <ListItemButton onClick={() => handleNavigate('/profile?tab=0')}>
         <ListItemIcon>
           <EditOutlined />
         </ListItemIcon>
         <ListItemText primary="Edit Profile" />
       </ListItemButton>
-      <ListItemButton>
+      <ListItemButton onClick={() => handleNavigate('/profile?tab=0')}>
         <ListItemIcon>
           <UserOutlined />
         </ListItemIcon>
         <ListItemText primary="View Profile" />
       </ListItemButton>
 
-      <ListItemButton>
+      <ListItemButton onClick={() => handleNavigate('/profile?tab=3')}>
         <ListItemIcon>
           <ProfileOutlined />
         </ListItemIcon>
         <ListItemText primary="Social Profile" />
       </ListItemButton>
-      <ListItemButton>
+      <ListItemButton onClick={() => handleNavigate('/profile?tab=2')}>
         <ListItemIcon>
           <WalletOutlined />
         </ListItemIcon>
         <ListItemText primary="Billing" />
       </ListItemButton>
-      <ListItemButton onClick={handleLogout}>
+      <ListItemButton onClick={(e) => {
+        handleLogout(e);
+        if (onClose) onClose();
+      }}>
         <ListItemIcon>
           <LogoutOutlined />
         </ListItemIcon>
@@ -54,5 +65,7 @@ export default function ProfileTab({ handleLogout }) {
 }
 
 ProfileTab.propTypes = {
-  handleLogout: PropTypes.func
+  handleLogout: PropTypes.func,
+  onClose: PropTypes.func
 };
+

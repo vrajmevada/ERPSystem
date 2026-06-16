@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuth from 'hooks/useAuth';
 
@@ -30,6 +30,18 @@ import LogoutOutlined from '@ant-design/icons/LogoutOutlined';
 import SettingOutlined from '@ant-design/icons/SettingOutlined';
 import UserOutlined from '@ant-design/icons/UserOutlined';
 import avatar1 from 'assets/images/users/avatar-1.png';
+import avatar2 from 'assets/images/users/avatar-2.png';
+import avatar3 from 'assets/images/users/avatar-3.png';
+import avatar4 from 'assets/images/users/avatar-4.png';
+import avatar5 from 'assets/images/users/avatar-5.png';
+
+const avatars = {
+  'avatar-1': avatar1,
+  'avatar-2': avatar2,
+  'avatar-3': avatar3,
+  'avatar-4': avatar4,
+  'avatar-5': avatar5
+};
 
 // tab panel wrapper
 function TabPanel({ children, value, index, ...other }) {
@@ -53,6 +65,22 @@ export default function Profile() {
   const theme = useTheme();
   const navigate = useNavigate();
   const { logout, user } = useAuth();
+  const [profileVersion, setProfileVersion] = useState(0);
+
+  useEffect(() => {
+    const handleProfileUpdate = () => {
+      setProfileVersion((prev) => prev + 1);
+    };
+    window.addEventListener('profile-update', handleProfileUpdate);
+    return () => {
+      window.removeEventListener('profile-update', handleProfileUpdate);
+    };
+  }, []);
+
+  const savedAvatar = localStorage.getItem('erp-user-avatar') || 'avatar-1';
+  const currentAvatar = avatars[savedAvatar] || avatar1;
+  const fullName = localStorage.getItem('erp-user-fullname') || user?.username || 'John Doe';
+  const displayRole = localStorage.getItem('erp-user-department') || user?.role || 'UI/UX Designer';
 
   const handleLogout = async () => {
     try {
@@ -97,7 +125,7 @@ export default function Profile() {
           aria-haspopup="true"
           onClick={handleToggle}
         >
-          <Avatar alt="profile user" src={avatar1} size="sm" sx={{ '&:hover': { outline: '1px solid', outlineColor: 'primary.main' } }} />
+          <Avatar alt="profile user" src={currentAvatar} size="sm" sx={{ '&:hover': { outline: '1px solid', outlineColor: 'primary.main' } }} />
         </ButtonBase>
       </Tooltip>
       <Popper
@@ -126,11 +154,11 @@ export default function Profile() {
                   <CardContent sx={{ px: 2.5, pt: 3 }}>
                     <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
                       <Stack direction="row" sx={{ gap: 1.25, alignItems: 'center' }}>
-                        <Avatar alt="profile user" src={avatar1} sx={{ width: 32, height: 32 }} />
+                        <Avatar alt="profile user" src={currentAvatar} sx={{ width: 32, height: 32 }} />
                         <Stack>
-                          <Typography variant="h6">{user?.username || 'John Doe'}</Typography>
+                          <Typography variant="h6">{fullName}</Typography>
                           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                            {user?.role || 'UI/UX Designer'}
+                            {displayRole}
                           </Typography>
                         </Stack>
                       </Stack>
@@ -179,10 +207,10 @@ export default function Profile() {
                     </Tabs>
                   </Box>
                   <TabPanel value={value} index={0} dir={theme.direction}>
-                    <ProfileTab handleLogout={handleLogout} />
+                    <ProfileTab handleLogout={handleLogout} onClose={() => setOpen(false)} />
                   </TabPanel>
                   <TabPanel value={value} index={1} dir={theme.direction}>
-                    <SettingTab />
+                    <SettingTab onClose={() => setOpen(false)} />
                   </TabPanel>
                 </MainCard>
               </ClickAwayListener>
