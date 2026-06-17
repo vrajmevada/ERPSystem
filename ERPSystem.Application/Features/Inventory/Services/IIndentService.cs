@@ -1,4 +1,4 @@
-﻿using ERPSystem.Application.Common;
+using ERPSystem.Application.Common;
 using ERPSystem.Application.Features.Inventory.DTOs;
 
 namespace ERPSystem.Application.Features.Inventory.Services;
@@ -20,4 +20,6 @@ public interface IIndentService
     Task DisapproveAsync(int id);
 
     Task DeleteAsync(int id);
+
+    Task ShortCloseAsync(int id, ShortCloseIndentDto dto);
 }

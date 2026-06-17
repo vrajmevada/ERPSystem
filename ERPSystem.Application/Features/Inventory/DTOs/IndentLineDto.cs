@@ -7,5 +7,6 @@ public record IndentLineDto(
     string ProductName,
     decimal Quantity,
     decimal? EstimatedRate,
-    string Notes
+    string Notes,
+    decimal ShortClosedQuantity
 );

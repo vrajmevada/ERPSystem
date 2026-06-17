@@ -11,7 +11,7 @@ public class IndentLine
     public decimal Quantity { get; set; }
     public decimal? EstimatedRate { get; set; }
     public string Notes { get; set; } = string.Empty;
-
+    public decimal ShortClosedQuantity { get; set; } 
     // Navigation properties
     public Product Product { get; set; } = null!;
 }

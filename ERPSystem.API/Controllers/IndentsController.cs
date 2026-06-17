@@ -1,4 +1,4 @@
-﻿using ERPSystem.Application.Features.Inventory.DTOs;
+using ERPSystem.Application.Features.Inventory.DTOs;
 using ERPSystem.Application.Features.Inventory.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -60,6 +60,13 @@ public class IndentsController : ControllerBase
     public async Task<IActionResult> Delete(int id)
     {
         await _indentService.DeleteAsync(id);
+        return NoContent();
+    }
+
+    [HttpPut("{id:int}/short-close")]
+    public async Task<IActionResult> ShortClose(int id, [FromBody] ShortCloseIndentDto dto)
+    {
+        await _indentService.ShortCloseAsync(id, dto);
         return NoContent();
     }
 }
