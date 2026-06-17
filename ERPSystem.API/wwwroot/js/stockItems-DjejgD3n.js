@@ -1,2 +1,0 @@
-import{y as e}from"./isDeepEqual-CMC74PTz.js";var t=async(t=``,n=1,r=100)=>(await e.get(`/stockitems`,{params:{search:t,page:n,pageSize:r}})).data;export{t};
-//# sourceMappingURL=stockItems-DjejgD3n.js.map

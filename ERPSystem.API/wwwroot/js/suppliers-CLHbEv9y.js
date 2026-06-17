@@ -1,2 +1,0 @@
-import{y as e}from"./isDeepEqual-CMC74PTz.js";var t=async(t=``,n=1,r=10)=>(await e.get(`/suppliers`,{params:{search:t,page:n,pageSize:r}})).data,n=async t=>(await e.post(`/suppliers`,t)).data,r=async(t,n)=>(await e.put(`/suppliers/${t}`,n)).data,i=async t=>(await e.delete(`/suppliers/${t}`)).data;export{r as i,i as n,t as r,n as t};
-//# sourceMappingURL=suppliers-CLHbEv9y.js.map

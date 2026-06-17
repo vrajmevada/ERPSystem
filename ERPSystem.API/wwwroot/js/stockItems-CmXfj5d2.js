@@ -1,0 +1,2 @@
+import{_ as e}from"./isDeepEqual-BitwDbp5.js";var t=async(t=``,n=1,r=100)=>(await e.get(`/stockitems`,{params:{search:t,page:n,pageSize:r}})).data;export{t};
+//# sourceMappingURL=stockItems-CmXfj5d2.js.map
