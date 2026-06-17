@@ -37,12 +37,34 @@ public class ApplicationDbContext : DbContext
     public DbSet<SalesOrderItem> SalesOrderItems => Set<SalesOrderItem>();
     public DbSet<User> Users => Set<User>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<Department> Departments => Set<Department>();
+    public DbSet<Indent> Indents => Set<Indent>();
+    public DbSet<IndentLine> IndentLines => Set<IndentLine>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<InventoryTransaction>()
             .Property(x => x.TransactionType)
             .HasConversion<string>();
+
+        // Configure Indent relationships
+        modelBuilder.Entity<Indent>()
+            .HasOne(i => i.RequestingDept)
+            .WithMany()
+            .HasForeignKey(i => i.RequestingDeptId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Indent>()
+            .HasOne(i => i.TargetDept)
+            .WithMany()
+            .HasForeignKey(i => i.TargetDeptId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Indent>()
+            .HasMany(i => i.Lines)
+            .WithOne()
+            .HasForeignKey(l => l.IndentId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         base.OnModelCreating(modelBuilder);
     }
