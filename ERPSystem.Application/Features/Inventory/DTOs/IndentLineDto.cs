@@ -4,6 +4,7 @@ public record IndentLineDto(
     int IndentId,
     int LineNo,
     int ProductId,
+    string ProductName,
     decimal Quantity,
     decimal? EstimatedRate,
     string Notes

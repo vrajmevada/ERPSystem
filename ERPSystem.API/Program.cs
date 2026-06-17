@@ -102,12 +102,15 @@ builder.Services.AddScoped<
     ProductRepository>();
 ProductMappingConfig.Register();
 StockItemMappingConfig.Register();
+IndentMappingConfig.Register();
+GrnMappingConfig.Register();
 builder.Services.AddScoped<
     IProductService,
     ProductService>();
 builder.Services.AddScoped<
     ICustomerRepository,
     CustomerRepository>();
+builder.Services.AddScoped<IIndentRepository, IndentRepository>();
 builder.Services.AddScoped<
     IStockItemRepository,
     StockItemRepository>();
@@ -115,9 +118,13 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     IStockItemService,
     StockItemService>();
+builder.Services.AddScoped<IIndentService, IndentService>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateCategoryDtoValidator>();
 builder.Services.AddScoped<
     ICustomerService,
     CustomerService>();
+builder.Services.AddScoped<IGoodsReceiptNoteRepository, GoodsReceiptNoteRepository>();
+builder.Services.AddScoped<IGoodsReceiptNoteService, GoodsReceiptNoteService>();
 builder.Services.AddScoped<
     IWarehouseRepository,
     WarehouseRepository>();

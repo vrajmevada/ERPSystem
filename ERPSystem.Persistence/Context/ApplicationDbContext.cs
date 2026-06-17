@@ -40,6 +40,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<Department> Departments => Set<Department>();
     public DbSet<Indent> Indents => Set<Indent>();
     public DbSet<IndentLine> IndentLines => Set<IndentLine>();
+    public DbSet<GoodsReceiptNote> GoodsReceiptNotes => Set<GoodsReceiptNote>();
+    public DbSet<GoodsReceiptNoteLine> GoodsReceiptNoteLines => Set<GoodsReceiptNoteLine>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -64,6 +66,12 @@ public class ApplicationDbContext : DbContext
             .HasMany(i => i.Lines)
             .WithOne()
             .HasForeignKey(l => l.IndentId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<GoodsReceiptNote>()
+            .HasMany(g =>g.Lines)
+            .WithOne()
+            .HasForeignKey(l => l.GoodsReceiptNoteId)
             .OnDelete(DeleteBehavior.Cascade);
 
         base.OnModelCreating(modelBuilder);
