@@ -49,6 +49,11 @@ public class ApplicationDbContext : DbContext
     public DbSet<StockConvert> StockConverts => Set<StockConvert>();
     public DbSet<StockConvertSourceLine> StockConvertSourceLines => Set<StockConvertSourceLine>();
     public DbSet<StockConvertDestinationLine> StockConvertDestinationLines => Set<StockConvertDestinationLine>();
+    public DbSet<OpeningStock> OpeningStocks => Set<OpeningStock>();
+    public DbSet<MaterialInward> MaterialInwards => Set<MaterialInward>();
+    public DbSet<MaterialInwardLine> MaterialInwardLines => Set<MaterialInwardLine>();
+    public DbSet<MaterialOutward> MaterialOutwards => Set<MaterialOutward>();
+    public DbSet<MaterialOutwardLine> MaterialOutwardLines => Set<MaterialOutwardLine>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -153,6 +158,40 @@ public class ApplicationDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(l => l.WarehouseId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<OpeningStock>(entity =>
+        {
+            entity.HasOne(o => o.Warehouse)
+                .WithMany()
+                .HasForeignKey(o => o.WarehouseId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.Property(o => o.Rate).HasPrecision(18, 4);
+            entity.Property(o => o.Amount).HasPrecision(18, 2);
+        });
+
+        modelBuilder.Entity<MaterialInward>(entity =>
+        {
+            entity.HasOne(m => m.Warehouse)
+                .WithMany()
+                .HasForeignKey(m => m.WarehouseId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasMany(m => m.Lines)
+                .WithOne()
+                .HasForeignKey(l => l.MaterialInwardId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<MaterialOutward>(entity =>
+        {
+            entity.HasOne(m => m.Warehouse)
+                .WithMany()
+                .HasForeignKey(m => m.WarehouseId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasMany(m => m.Lines)
+                .WithOne()
+                .HasForeignKey(l => l.MaterialOutwardId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         base.OnModelCreating(modelBuilder);

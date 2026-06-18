@@ -100,13 +100,14 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     IProductRepository,
     ProductRepository>();
-ProductMappingConfig.Register();
-StockItemMappingConfig.Register();
-IndentMappingConfig.Register();
-GrnMappingConfig.Register();
-TransferSlipMappingConfig.Register();
-DeliveryChallanMappingConfig.Register();
-StockConvertMappingConfig.Register();
+        ProductMappingConfig.Register();
+        StockItemMappingConfig.Register();
+        IndentMappingConfig.Register();
+        GrnMappingConfig.Register();
+        TransferSlipMappingConfig.Register();
+        DeliveryChallanMappingConfig.Register();
+        StockConvertMappingConfig.Register();
+        InventoryMappingConfig.Register();
 builder.Services.AddScoped<
     IProductService,
     ProductService>();
@@ -134,6 +135,12 @@ builder.Services.AddScoped<IDeliveryChallanRepository, DeliveryChallanRepository
 builder.Services.AddScoped<IDeliveryChallanService, DeliveryChallanService>();
 builder.Services.AddScoped<IStockConvertRepository, StockConvertRepository>();
 builder.Services.AddScoped<IStockConvertService, StockConvertService>();
+builder.Services.AddScoped<IOpeningStockRepository, OpeningStockRepository>();
+builder.Services.AddScoped<IOpeningStockService, OpeningStockService>();
+builder.Services.AddScoped<IMaterialInwardRepository, MaterialInwardRepository>();
+builder.Services.AddScoped<IMaterialInwardService, MaterialInwardService>();
+builder.Services.AddScoped<IMaterialOutwardRepository, MaterialOutwardRepository>();
+builder.Services.AddScoped<IMaterialOutwardService, MaterialOutwardService>();
 builder.Services.AddScoped<
     IWarehouseRepository,
     WarehouseRepository>();

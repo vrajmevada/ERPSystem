@@ -1,4 +1,4 @@
-﻿using ERPSystem.Application.Features.Reports.DTOs;
+using ERPSystem.Application.Features.Reports.DTOs;
 using ERPSystem.Application.Interfaces.Reports;
 
 namespace ERPSystem.Application.Features.Reports.Services;
@@ -37,5 +37,20 @@ public class ReportService : IReportService
     {
         return await _repository
             .GetPurchaseSummaryAsync();
+    }
+
+    public async Task<IEnumerable<StockReportDto>> GetStockReportAsync(int? warehouseId, int? productId)
+    {
+        return await _repository.GetStockReportAsync(warehouseId, productId);
+    }
+
+    public async Task<IEnumerable<StockSummaryReportDto>> GetStockSummaryReportAsync(int? productId)
+    {
+        return await _repository.GetStockSummaryReportAsync(productId);
+    }
+
+    public async Task<IEnumerable<TrackingDetailReportDto>> GetTrackingDetailReportAsync(int? productId, int? warehouseId, DateTime? startDate, DateTime? endDate)
+    {
+        return await _repository.GetTrackingDetailReportAsync(productId, warehouseId, startDate, endDate);
     }
 }

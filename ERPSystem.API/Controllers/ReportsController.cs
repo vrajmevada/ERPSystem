@@ -1,4 +1,4 @@
-﻿using ERPSystem.Application.Features.Reports.DTOs;
+using ERPSystem.Application.Features.Reports.DTOs;
 using ERPSystem.Application.Features.Reports.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -52,5 +52,23 @@ public class ReportsController : ControllerBase
         return Ok(
             await _service
                 .GetPurchaseSummaryAsync());
+    }
+
+    [HttpGet("stock-report")]
+    public async Task<IActionResult> GetStockReport([FromQuery] int? warehouseId, [FromQuery] int? productId)
+    {
+        return Ok(await _service.GetStockReportAsync(warehouseId, productId));
+    }
+
+    [HttpGet("stock-summary")]
+    public async Task<IActionResult> GetStockSummary([FromQuery] int? productId)
+    {
+        return Ok(await _service.GetStockSummaryReportAsync(productId));
+    }
+
+    [HttpGet("tracking-detail")]
+    public async Task<IActionResult> GetTrackingDetail([FromQuery] int? productId, [FromQuery] int? warehouseId, [FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate)
+    {
+        return Ok(await _service.GetTrackingDetailReportAsync(productId, warehouseId, startDate, endDate));
     }
 }

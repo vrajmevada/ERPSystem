@@ -10,5 +10,8 @@ public enum InventoryTransactionType
     TransferIn = 6,
     DeliveryChallanOut = 7,
     StockConvertIssue = 8,
-    StockConvertReceipt = 9
+    StockConvertReceipt = 9,
+    OpeningStock = 10,
+    MaterialInward = 11,
+    MaterialOutward = 12
 }
