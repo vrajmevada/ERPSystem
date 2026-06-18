@@ -8,5 +8,7 @@ public enum InventoryTransactionType
     Adjustment = 4,
     TransferOut = 5,
     TransferIn = 6,
-    DeliveryChallanOut = 7
+    DeliveryChallanOut = 7,
+    StockConvertIssue = 8,
+    StockConvertReceipt = 9
 }

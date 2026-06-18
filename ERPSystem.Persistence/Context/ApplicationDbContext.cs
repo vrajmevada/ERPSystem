@@ -46,6 +46,9 @@ public class ApplicationDbContext : DbContext
     public DbSet<TransferSlipLine> TransferSlipLines => Set<TransferSlipLine>();
     public DbSet<DeliveryChallan> DeliveryChallans => Set<DeliveryChallan>();
     public DbSet<DeliveryChallanLine> DeliveryChallanLines => Set<DeliveryChallanLine>();
+    public DbSet<StockConvert> StockConverts => Set<StockConvert>();
+    public DbSet<StockConvertSourceLine> StockConvertSourceLines => Set<StockConvertSourceLine>();
+    public DbSet<StockConvertDestinationLine> StockConvertDestinationLines => Set<StockConvertDestinationLine>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -121,6 +124,35 @@ public class ApplicationDbContext : DbContext
             entity.Property(l => l.DiscountPercentage).HasPrecision(18, 2);
             entity.Property(l => l.DiscountAmount).HasPrecision(18, 2);
             entity.Property(l => l.TotalAmount).HasPrecision(18, 2);
+        });
+
+        modelBuilder.Entity<StockConvert>(entity =>
+        {
+            entity.HasMany(s => s.SourceLines)
+                .WithOne()
+                .HasForeignKey(l => l.StockConvertId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasMany(s => s.DestinationLines)
+                .WithOne()
+                .HasForeignKey(l => l.StockConvertId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<StockConvertSourceLine>(entity =>
+        {
+            entity.HasOne(l => l.Warehouse)
+                .WithMany()
+                .HasForeignKey(l => l.WarehouseId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<StockConvertDestinationLine>(entity =>
+        {
+            entity.HasOne(l => l.Warehouse)
+                .WithMany()
+                .HasForeignKey(l => l.WarehouseId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
         base.OnModelCreating(modelBuilder);
