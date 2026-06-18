@@ -7,4 +7,5 @@ public record TransferSlipLineDto(
     int ProductId,
     string ProductName,
     int Quantity,
+    int ShortClosedQuantity,
     string Notes);

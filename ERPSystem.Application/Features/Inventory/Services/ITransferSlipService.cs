@@ -16,4 +16,5 @@ public interface ITransferSlipService
     Task<TransferSlipDto> CreateAsync(CreateTransferSlipDto dto);
     Task ShipAsync(int id);
     Task ReceiveAsync(int id);
+    Task ShortCloseAsync(int id, ShortCloseTransferSlipDto dto);
 }

@@ -55,4 +55,11 @@ public class TransferSlipsController : ControllerBase
         await _service.ReceiveAsync(id);
         return NoContent();
     }
+
+    [HttpPut("{id:int}/short-close")]
+    public async Task<IActionResult> ShortClose(int id, [FromBody] ShortCloseTransferSlipDto dto)
+    {
+        await _service.ShortCloseAsync(id, dto);
+        return NoContent();
+    }
 }

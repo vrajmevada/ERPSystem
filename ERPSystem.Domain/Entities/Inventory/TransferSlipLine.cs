@@ -10,5 +10,6 @@ public class TransferSlipLine
     public int ProductId { get; set; }
     public Product Product { get; set; } = null!;
     public int Quantity { get; set; }
+    public int ShortClosedQuantity { get; set; } = 0;
     public string Notes { get; set; } = string.Empty;
 }
