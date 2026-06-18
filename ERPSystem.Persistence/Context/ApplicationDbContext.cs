@@ -42,6 +42,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<IndentLine> IndentLines => Set<IndentLine>();
     public DbSet<GoodsReceiptNote> GoodsReceiptNotes => Set<GoodsReceiptNote>();
     public DbSet<GoodsReceiptNoteLine> GoodsReceiptNoteLines => Set<GoodsReceiptNoteLine>();
+    public DbSet<TransferSlip> TransferSlips => Set<TransferSlip>();
+    public DbSet<TransferSlipLine> TransferSlipLines => Set<TransferSlipLine>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -72,6 +74,25 @@ public class ApplicationDbContext : DbContext
             .HasMany(g =>g.Lines)
             .WithOne()
             .HasForeignKey(l => l.GoodsReceiptNoteId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Configure TransferSlip relationships
+        modelBuilder.Entity<TransferSlip>()
+            .HasOne(t => t.FromWarehouse)
+            .WithMany()
+            .HasForeignKey(t => t.FromWarehouseId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<TransferSlip>()
+            .HasOne(t => t.ToWarehouse)
+            .WithMany()
+            .HasForeignKey(t => t.ToWarehouseId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<TransferSlip>()
+            .HasMany(t => t.Lines)
+            .WithOne()
+            .HasForeignKey(l => l.TransferSlipId)
             .OnDelete(DeleteBehavior.Cascade);
 
         base.OnModelCreating(modelBuilder);

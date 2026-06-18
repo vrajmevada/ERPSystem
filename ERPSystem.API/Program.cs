@@ -104,6 +104,7 @@ ProductMappingConfig.Register();
 StockItemMappingConfig.Register();
 IndentMappingConfig.Register();
 GrnMappingConfig.Register();
+TransferSlipMappingConfig.Register();
 builder.Services.AddScoped<
     IProductService,
     ProductService>();
@@ -125,6 +126,8 @@ builder.Services.AddScoped<
     CustomerService>();
 builder.Services.AddScoped<IGoodsReceiptNoteRepository, GoodsReceiptNoteRepository>();
 builder.Services.AddScoped<IGoodsReceiptNoteService, GoodsReceiptNoteService>();
+builder.Services.AddScoped<ITransferSlipRepository, TransferSlipRepository>();
+builder.Services.AddScoped<ITransferSlipService, TransferSlipService>();
 builder.Services.AddScoped<
     IWarehouseRepository,
     WarehouseRepository>();
