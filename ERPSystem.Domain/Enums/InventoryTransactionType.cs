@@ -7,5 +7,6 @@ public enum InventoryTransactionType
     Damage = 3,
     Adjustment = 4,
     TransferOut = 5,
-    TransferIn = 6
+    TransferIn = 6,
+    DeliveryChallanOut = 7
 }

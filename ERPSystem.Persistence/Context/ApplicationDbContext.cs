@@ -44,6 +44,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<GoodsReceiptNoteLine> GoodsReceiptNoteLines => Set<GoodsReceiptNoteLine>();
     public DbSet<TransferSlip> TransferSlips => Set<TransferSlip>();
     public DbSet<TransferSlipLine> TransferSlipLines => Set<TransferSlipLine>();
+    public DbSet<DeliveryChallan> DeliveryChallans => Set<DeliveryChallan>();
+    public DbSet<DeliveryChallanLine> DeliveryChallanLines => Set<DeliveryChallanLine>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -94,6 +96,32 @@ public class ApplicationDbContext : DbContext
             .WithOne()
             .HasForeignKey(l => l.TransferSlipId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<DeliveryChallan>(entity =>
+        {
+            entity.HasOne(d => d.Customer)
+                .WithMany()
+                .HasForeignKey(d => d.CustomerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(d => d.FromWarehouse)
+                .WithMany()
+                .HasForeignKey(d => d.FromWarehouseId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasMany(d => d.Lines)
+                .WithOne()
+                .HasForeignKey(l => l.DeliveryChallanId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<DeliveryChallanLine>(entity =>
+        {
+            entity.Property(l => l.UnitPrice).HasPrecision(18, 2);
+            entity.Property(l => l.DiscountPercentage).HasPrecision(18, 2);
+            entity.Property(l => l.DiscountAmount).HasPrecision(18, 2);
+            entity.Property(l => l.TotalAmount).HasPrecision(18, 2);
+        });
 
         base.OnModelCreating(modelBuilder);
     }
