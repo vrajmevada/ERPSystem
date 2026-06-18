@@ -28,6 +28,13 @@ const MaterialOutwardsPage = Loadable(lazy(() => import('pages/inventory/Materia
 const StockReportPage = Loadable(lazy(() => import('pages/inventory/StockReportPage')));
 const StockSummaryReportPage = Loadable(lazy(() => import('pages/inventory/StockSummaryReportPage')));
 const TrackingDetailReportPage = Loadable(lazy(() => import('pages/inventory/TrackingDetailReportPage')));
+const GrnApprovalPage = Loadable(lazy(() => import('pages/inventory/GrnApprovalPage')));
+const IndentsPage = Loadable(lazy(() => import('pages/inventory/IndentsPage')));
+const IndentShortClosePage = Loadable(lazy(() => import('pages/inventory/IndentShortClosePage')));
+const TransferSlipsPage = Loadable(lazy(() => import('pages/inventory/TransferSlipsPage')));
+const TransferSlipCancellationPage = Loadable(lazy(() => import('pages/inventory/TransferSlipCancellationPage')));
+const DeliveryChallansPage = Loadable(lazy(() => import('pages/inventory/DeliveryChallansPage')));
+const StockConversionsPage = Loadable(lazy(() => import('pages/inventory/StockConversionsPage')));
 
 // render - color
 const Color = Loadable(lazy(() => import('pages/component-overview/color')));
@@ -110,6 +117,34 @@ const MainRoutes = {
         {
           path: 'tracking-detail',
           element: <TrackingDetailReportPage />
+        },
+        {
+          path: 'grn-approval',
+          element: <GrnApprovalPage />
+        },
+        {
+          path: 'indents',
+          element: <IndentsPage />
+        },
+        {
+          path: 'indent-short-close',
+          element: <IndentShortClosePage />
+        },
+        {
+          path: 'transfer-slips',
+          element: <TransferSlipsPage />
+        },
+        {
+          path: 'transfer-slip-cancellation',
+          element: <TransferSlipCancellationPage />
+        },
+        {
+          path: 'delivery-challans',
+          element: <DeliveryChallansPage />
+        },
+        {
+          path: 'stock-conversions',
+          element: <StockConversionsPage />
         }
       ]
     },

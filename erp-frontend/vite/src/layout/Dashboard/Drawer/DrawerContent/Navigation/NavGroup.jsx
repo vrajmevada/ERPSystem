@@ -7,6 +7,7 @@ import Box from '@mui/material/Box';
 
 // project import
 import NavItem from './NavItem';
+import NavCollapse from './NavCollapse';
 import { useGetMenuMaster } from 'api/menu';
 
 // ==============================|| NAVIGATION - LIST GROUP ||============================== //
@@ -18,11 +19,7 @@ export default function NavGroup({ item }) {
   const navCollapse = item.children?.map((menuItem) => {
     switch (menuItem.type) {
       case 'collapse':
-        return (
-          <Typography key={menuItem.id} variant="caption" sx={{ p: 2.5, color: 'error.main' }}>
-            collapse - only available in paid version
-          </Typography>
-        );
+        return <NavCollapse key={menuItem.id} item={menuItem} level={1} />;
       case 'item':
         return <NavItem key={menuItem.id} item={menuItem} level={1} />;
       default:
