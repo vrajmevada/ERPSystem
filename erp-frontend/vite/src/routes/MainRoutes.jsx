@@ -22,6 +22,13 @@ const SalesOrdersPage = Loadable(lazy(() => import('pages/placeholder/SalesOrder
 const AuditLogsPage = Loadable(lazy(() => import('pages/placeholder/AuditLogsPage')));
 const ProfilePage = Loadable(lazy(() => import('pages/profile')));
 
+const OpeningStocksPage = Loadable(lazy(() => import('pages/inventory/OpeningStocksPage')));
+const MaterialInwardsPage = Loadable(lazy(() => import('pages/inventory/MaterialInwardsPage')));
+const MaterialOutwardsPage = Loadable(lazy(() => import('pages/inventory/MaterialOutwardsPage')));
+const StockReportPage = Loadable(lazy(() => import('pages/inventory/StockReportPage')));
+const StockSummaryReportPage = Loadable(lazy(() => import('pages/inventory/StockSummaryReportPage')));
+const TrackingDetailReportPage = Loadable(lazy(() => import('pages/inventory/TrackingDetailReportPage')));
+
 // render - color
 const Color = Loadable(lazy(() => import('pages/component-overview/color')));
 const Typography = Loadable(lazy(() => import('pages/component-overview/typography')));
@@ -76,6 +83,35 @@ const MainRoutes = {
     {
       path: 'transactions',
       element: <TransactionsPage />
+    },
+    {
+      path: 'inventory',
+      children: [
+        {
+          path: 'opening-stock',
+          element: <OpeningStocksPage />
+        },
+        {
+          path: 'material-inward',
+          element: <MaterialInwardsPage />
+        },
+        {
+          path: 'material-outward',
+          element: <MaterialOutwardsPage />
+        },
+        {
+          path: 'stock-report',
+          element: <StockReportPage />
+        },
+        {
+          path: 'stock-summary',
+          element: <StockSummaryReportPage />
+        },
+        {
+          path: 'tracking-detail',
+          element: <TrackingDetailReportPage />
+        }
+      ]
     },
     {
       path: 'purchase-orders',
