@@ -70,7 +70,7 @@ export default function GrnApprovalPage() {
     setLoading(true);
     try {
       const data = await getGoodsReceiptNotes();
-      setGrns(data.items || []);
+      setGrns(Array.isArray(data) ? data : (data && Array.isArray(data.items) ? data.items : []));
     } catch (error) {
       console.error('Failed to load Goods Receipt Notes:', error);
       showNotification('Failed to load Goods Receipt Notes', 'error');
@@ -302,7 +302,7 @@ export default function GrnApprovalPage() {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {selectedGrn.lines.map((l, index) => (
+                    {(selectedGrn?.lines || []).map((l, index) => (
                       <TableRow key={l.id || index}>
                         <TableCell>{index + 1}</TableCell>
                         <TableCell>{l.productName}</TableCell>

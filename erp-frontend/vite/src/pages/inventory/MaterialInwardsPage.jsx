@@ -103,7 +103,7 @@ export default function MaterialInwardsPage() {
     setLoading(true);
     try {
       const data = await getMaterialInwards();
-      setInwards(data.items || []);
+      setInwards(Array.isArray(data) ? data : (data && Array.isArray(data.items) ? data.items : []));
     } catch (error) {
       console.error('Failed to load material inwards:', error);
       showNotification('Failed to load material inwards', 'error');
@@ -115,10 +115,10 @@ export default function MaterialInwardsPage() {
   const loadMetadata = async () => {
     try {
       const whs = await getWarehouses();
-      setWarehouses(whs || []);
+      setWarehouses(Array.isArray(whs) ? whs : (whs && Array.isArray(whs.items) ? whs.items : []));
 
       const prods = await getProducts('', 1, 500);
-      setProducts(prods.items || []);
+      setProducts(Array.isArray(prods) ? prods : (prods && Array.isArray(prods.items) ? prods.items : []));
     } catch (err) {
       console.error('Failed to load metadata:', err);
     }
@@ -646,7 +646,7 @@ export default function MaterialInwardsPage() {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {selectedInward.lines.map((l) => (
+                    {(selectedInward?.lines || []).map((l) => (
                       <TableRow key={l.id}>
                         <TableCell>{l.lineNo}</TableCell>
                         <TableCell>{l.productName}</TableCell>

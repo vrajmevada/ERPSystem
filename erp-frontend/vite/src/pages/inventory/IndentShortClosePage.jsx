@@ -70,7 +70,8 @@ export default function IndentShortClosePage() {
     try {
       const data = await getIndents();
       // Only show Approved indents for short close
-      const approvedIndents = (data.items || []).filter((i) => i.status === 'Approved');
+      const list = Array.isArray(data) ? data : (data && Array.isArray(data.items) ? data.items : []);
+      const approvedIndents = list.filter((i) => i.status === 'Approved');
       setIndents(approvedIndents);
     } catch (error) {
       console.error('Failed to load approved indents:', error);
@@ -99,7 +100,7 @@ export default function IndentShortClosePage() {
       setSelectedIndent(details);
       
       const initialQtys = {};
-      details.lines.forEach((l) => {
+      (details?.lines || []).forEach((l) => {
         const remaining = l.quantity - l.shortClosedQuantity;
         initialQtys[l.id] = remaining > 0 ? remaining : 0;
       });
@@ -146,7 +147,7 @@ export default function IndentShortClosePage() {
 
     try {
       setSubmitError('');
-      const linesToSubmit = selectedIndent.lines
+      const linesToSubmit = (selectedIndent?.lines || [])
         .map((l) => {
           const qty = parseFloat(closeQuantities[l.id]);
           return {
@@ -328,7 +329,7 @@ export default function IndentShortClosePage() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {selectedIndent?.lines.map((l) => {
+                  {(selectedIndent?.lines || []).map((l) => {
                     const remaining = l.quantity - l.shortClosedQuantity;
                     return (
                       <TableRow key={l.id}>
@@ -415,7 +416,7 @@ export default function IndentShortClosePage() {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {detailedIndent.lines.map((l) => (
+                    {(detailedIndent?.lines || []).map((l) => (
                       <TableRow key={l.id}>
                         <TableCell>{l.lineNo}</TableCell>
                         <TableCell>{l.productName}</TableCell>

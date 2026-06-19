@@ -35,7 +35,7 @@ export default function StockSummaryReportPage() {
   const loadMetadata = async () => {
     try {
       const prods = await getProducts('', 1, 500);
-      setProducts(prods.items || []);
+      setProducts(Array.isArray(prods) ? prods : (prods && Array.isArray(prods.items) ? prods.items : []));
     } catch (err) {
       console.error('Failed to load filter metadata:', err);
     }
@@ -48,7 +48,7 @@ export default function StockSummaryReportPage() {
       if (productId) params.productId = productId;
 
       const data = await getStockSummaryReport(params);
-      setReportData(data || []);
+      setReportData(Array.isArray(data) ? data : (data && Array.isArray(data.items) ? data.items : []));
     } catch (error) {
       console.error('Failed to run stock summary report:', error);
     } finally {
@@ -60,7 +60,7 @@ export default function StockSummaryReportPage() {
     setProductId('');
     setLoading(true);
     getStockSummaryReport({})
-      .then((data) => setReportData(data || []))
+      .then((data) => setReportData(Array.isArray(data) ? data : (data && Array.isArray(data.items) ? data.items : [])))
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
   };
@@ -174,7 +174,7 @@ export default function StockSummaryReportPage() {
             </Box>
           ) : (
             <DataGrid
-              rows={reportData.map((r, index) => ({ ...r, id: index }))}
+              rows={(Array.isArray(reportData) ? reportData : []).map((r, index) => ({ ...r, id: index }))}
               columns={columns}
               loading={loading}
               pageSizeOptions={[10, 25, 50]}

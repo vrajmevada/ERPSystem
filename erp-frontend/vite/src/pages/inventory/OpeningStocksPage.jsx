@@ -74,13 +74,13 @@ export default function OpeningStocksPage() {
     setLoading(true);
     try {
       const stockData = await getOpeningStocks();
-      setOpeningStocks(stockData.items || []);
+      setOpeningStocks(Array.isArray(stockData) ? stockData : (stockData && Array.isArray(stockData.items) ? stockData.items : []));
 
       const prodData = await getProducts('', 1, 500);
-      setProducts(prodData.items || []);
+      setProducts(Array.isArray(prodData) ? prodData : (prodData && Array.isArray(prodData.items) ? prodData.items : []));
 
       const whData = await getWarehouses();
-      setWarehouses(whData || []);
+      setWarehouses(Array.isArray(whData) ? whData : (whData && Array.isArray(whData.items) ? whData.items : []));
     } catch (error) {
       console.error('Failed to load opening stocks:', error);
       showNotification('Failed to load opening stock data', 'error');

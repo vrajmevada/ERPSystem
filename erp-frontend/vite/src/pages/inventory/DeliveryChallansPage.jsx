@@ -119,7 +119,7 @@ export default function DeliveryChallansPage() {
     setLoading(true);
     try {
       const data = await getDeliveryChallans();
-      setChallans(data.items || []);
+      setChallans(Array.isArray(data) ? data : (data && Array.isArray(data.items) ? data.items : []));
     } catch (error) {
       console.error('Failed to load delivery challans:', error);
       showNotification('Failed to load delivery challans', 'error');
@@ -131,13 +131,13 @@ export default function DeliveryChallansPage() {
   const loadMetadata = async () => {
     try {
       const custs = await getCustomers('', 1, 500);
-      setCustomers(custs.items || []);
+      setCustomers(Array.isArray(custs) ? custs : (custs && Array.isArray(custs.items) ? custs.items : []));
 
       const whs = await getWarehouses();
-      setWarehouses(whs || []);
+      setWarehouses(Array.isArray(whs) ? whs : (whs && Array.isArray(whs.items) ? whs.items : []));
 
       const prods = await getProducts('', 1, 500);
-      setProducts(prods.items || []);
+      setProducts(Array.isArray(prods) ? prods : (prods && Array.isArray(prods.items) ? prods.items : []));
     } catch (err) {
       console.error('Failed to load metadata:', err);
     }
@@ -832,7 +832,7 @@ export default function DeliveryChallansPage() {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {selectedChallan.lines.map((l) => (
+                    {(selectedChallan?.lines || []).map((l) => (
                       <TableRow key={l.id}>
                         <TableCell>{l.lineNo}</TableCell>
                         <TableCell>{l.productName}</TableCell>

@@ -108,7 +108,7 @@ export default function IndentsPage() {
     setLoading(true);
     try {
       const data = await getIndents();
-      setIndents(data.items || []);
+      setIndents(Array.isArray(data) ? data : (data && Array.isArray(data.items) ? data.items : []));
     } catch (error) {
       console.error('Failed to load indents:', error);
       showNotification('Failed to load indents', 'error');
@@ -120,10 +120,10 @@ export default function IndentsPage() {
   const loadMetadata = async () => {
     try {
       const depts = await getDepartments();
-      setDepartments(Array.isArray(depts) ? depts : []);
+      setDepartments(Array.isArray(depts) ? depts : (depts && Array.isArray(depts.items) ? depts.items : []));
 
       const prods = await getProducts('', 1, 500);
-      setProducts(prods.items || []);
+      setProducts(Array.isArray(prods) ? prods : (prods && Array.isArray(prods.items) ? prods.items : []));
     } catch (err) {
       console.error('Failed to load metadata:', err);
     }
@@ -687,7 +687,7 @@ export default function IndentsPage() {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {selectedIndent.lines.map((l) => (
+                    {(selectedIndent?.lines || []).map((l) => (
                       <TableRow key={l.id}>
                         <TableCell>{l.lineNo}</TableCell>
                         <TableCell>{l.productName}</TableCell>

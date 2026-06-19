@@ -103,7 +103,7 @@ export default function StockConversionsPage() {
     setLoading(true);
     try {
       const data = await getStockConversions();
-      setConversions(data.items || []);
+      setConversions(Array.isArray(data) ? data : (data && Array.isArray(data.items) ? data.items : []));
     } catch (error) {
       console.error('Failed to load stock conversions:', error);
       showNotification('Failed to load stock conversions', 'error');
@@ -115,10 +115,10 @@ export default function StockConversionsPage() {
   const loadMetadata = async () => {
     try {
       const whs = await getWarehouses();
-      setWarehouses(whs || []);
+      setWarehouses(Array.isArray(whs) ? whs : (whs && Array.isArray(whs.items) ? whs.items : []));
 
       const prods = await getProducts('', 1, 500);
-      setProducts(prods.items || []);
+      setProducts(Array.isArray(prods) ? prods : (prods && Array.isArray(prods.items) ? prods.items : []));
     } catch (err) {
       console.error('Failed to load metadata:', err);
     }
@@ -680,7 +680,7 @@ export default function StockConversionsPage() {
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {selectedConversion.sourceLines.map((l) => (
+                        {(selectedConversion?.sourceLines || []).map((l) => (
                           <TableRow key={l.id}>
                             <TableCell>{l.productName}</TableCell>
                             <TableCell>{l.warehouseName}</TableCell>
@@ -704,7 +704,7 @@ export default function StockConversionsPage() {
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {selectedConversion.destinationLines.map((l) => (
+                        {(selectedConversion?.destinationLines || []).map((l) => (
                           <TableRow key={l.id}>
                             <TableCell>{l.productName}</TableCell>
                             <TableCell>{l.warehouseName}</TableCell>

@@ -100,7 +100,7 @@ export default function TransferSlipsPage() {
     setLoading(true);
     try {
       const data = await getTransferSlips();
-      setSlips(data.items || []);
+      setSlips(Array.isArray(data) ? data : (data && Array.isArray(data.items) ? data.items : []));
     } catch (error) {
       console.error('Failed to load transfer slips:', error);
       showNotification('Failed to load transfer slips', 'error');
@@ -112,10 +112,10 @@ export default function TransferSlipsPage() {
   const loadMetadata = async () => {
     try {
       const whs = await getWarehouses();
-      setWarehouses(whs || []);
+      setWarehouses(Array.isArray(whs) ? whs : (whs && Array.isArray(whs.items) ? whs.items : []));
 
       const prods = await getProducts('', 1, 500);
-      setProducts(prods.items || []);
+      setProducts(Array.isArray(prods) ? prods : (prods && Array.isArray(prods.items) ? prods.items : []));
     } catch (err) {
       console.error('Failed to load metadata:', err);
     }
@@ -617,7 +617,7 @@ export default function TransferSlipsPage() {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {selectedSlip.lines.map((l) => (
+                    {(selectedSlip?.lines || []).map((l) => (
                       <TableRow key={l.id}>
                         <TableCell>{l.lineNo}</TableCell>
                         <TableCell>{l.productName}</TableCell>

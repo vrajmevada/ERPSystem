@@ -70,7 +70,8 @@ export default function TransferSlipCancellationPage() {
     try {
       const data = await getTransferSlips();
       // Only show Draft or Shipped transfer slips for short close
-      const cancelable = (data.items || []).filter((s) => s.status === 'Draft' || s.status === 'Shipped');
+      const list = Array.isArray(data) ? data : (data && Array.isArray(data.items) ? data.items : []);
+      const cancelable = list.filter((s) => s.status === 'Draft' || s.status === 'Shipped');
       setSlips(cancelable);
     } catch (error) {
       console.error('Failed to load cancelable transfer slips:', error);
@@ -99,7 +100,7 @@ export default function TransferSlipCancellationPage() {
       setSelectedSlip(details);
       
       const initialQtys = {};
-      details.lines.forEach((l) => {
+      (details?.lines || []).forEach((l) => {
         const remaining = l.quantity - l.shortClosedQuantity;
         initialQtys[l.productId] = remaining > 0 ? remaining : 0;
       });
@@ -146,7 +147,7 @@ export default function TransferSlipCancellationPage() {
 
     try {
       setSubmitError('');
-      const linesToSubmit = selectedSlip.lines
+      const linesToSubmit = (selectedSlip?.lines || [])
         .map((l) => {
           const qty = parseInt(closeQuantities[l.productId], 10);
           return {
@@ -328,7 +329,7 @@ export default function TransferSlipCancellationPage() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {selectedSlip?.lines.map((l) => {
+                  {(selectedSlip?.lines || []).map((l) => {
                     const remaining = l.quantity - l.shortClosedQuantity;
                     return (
                       <TableRow key={l.id}>
@@ -415,7 +416,7 @@ export default function TransferSlipCancellationPage() {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {detailedSlip.lines.map((l) => (
+                    {(detailedSlip?.lines || []).map((l) => (
                       <TableRow key={l.id}>
                         <TableCell>{l.lineNo}</TableCell>
                         <TableCell>{l.productName}</TableCell>

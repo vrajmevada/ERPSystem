@@ -43,10 +43,10 @@ export default function TrackingDetailReportPage() {
   const loadMetadata = async () => {
     try {
       const prods = await getProducts('', 1, 500);
-      setProducts(prods.items || []);
+      setProducts(Array.isArray(prods) ? prods : (prods && Array.isArray(prods.items) ? prods.items : []));
 
       const whs = await getWarehouses();
-      setWarehouses(whs || []);
+      setWarehouses(Array.isArray(whs) ? whs : (whs && Array.isArray(whs.items) ? whs.items : []));
     } catch (err) {
       console.error('Failed to load filter metadata:', err);
     }
@@ -62,7 +62,7 @@ export default function TrackingDetailReportPage() {
       if (endDate) params.endDate = new Date(endDate).toISOString();
 
       const data = await getTrackingDetailReport(params);
-      setReportData(data || []);
+      setReportData(Array.isArray(data) ? data : (data && Array.isArray(data.items) ? data.items : []));
     } catch (error) {
       console.error('Failed to run tracking detail report:', error);
     } finally {
@@ -77,7 +77,7 @@ export default function TrackingDetailReportPage() {
     setEndDate('');
     setLoading(true);
     getTrackingDetailReport({})
-      .then((data) => setReportData(data || []))
+      .then((data) => setReportData(Array.isArray(data) ? data : (data && Array.isArray(data.items) ? data.items : [])))
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
   };
@@ -258,7 +258,7 @@ export default function TrackingDetailReportPage() {
             </Box>
           ) : (
             <DataGrid
-              rows={reportData.map((r, index) => ({ ...r, id: index }))}
+              rows={(Array.isArray(reportData) ? reportData : []).map((r, index) => ({ ...r, id: index }))}
               columns={columns}
               loading={loading}
               pageSizeOptions={[10, 25, 50]}
