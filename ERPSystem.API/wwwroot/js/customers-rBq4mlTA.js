@@ -1,0 +1,2 @@
+import{_ as e}from"./isDeepEqual-CwWbk8GQ.js";var t=async(t=``,n=1,r=10)=>(await e.get(`/customers`,{params:{search:t,page:n,pageSize:r}})).data,n=async t=>(await e.post(`/customers`,t)).data,r=async(t,n)=>(await e.put(`/customers/${t}`,n)).data,i=async t=>(await e.delete(`/customers/${t}`)).data;export{r as i,i as n,t as r,n as t};
+//# sourceMappingURL=customers-rBq4mlTA.js.map

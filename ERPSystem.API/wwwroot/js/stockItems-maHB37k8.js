@@ -1,0 +1,2 @@
+import{_ as e}from"./isDeepEqual-CwWbk8GQ.js";var t=async(t=``,n=1,r=100)=>(await e.get(`/stockitems`,{params:{search:t,page:n,pageSize:r}})).data;export{t};
+//# sourceMappingURL=stockItems-maHB37k8.js.map

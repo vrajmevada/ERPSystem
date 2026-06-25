@@ -1,2 +1,0 @@
-import{_ as e}from"./isDeepEqual-BitwDbp5.js";var t=async(t=``,n=1,r=10)=>(await e.get(`/products`,{params:{search:t,page:n,pageSize:r}})).data,n=async t=>(await e.post(`/products`,t)).data,r=async()=>(await e.get(`/categories`)).data,i=async(t,n)=>(await e.put(`/products/${t}`,n)).data,a=async t=>(await e.delete(`/products/${t}`)).data;export{i as a,t as i,a as n,r,n as t};
-//# sourceMappingURL=products-JoQdnNZW.js.map

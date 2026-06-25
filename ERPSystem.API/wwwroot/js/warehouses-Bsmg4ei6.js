@@ -1,0 +1,2 @@
+import{_ as e}from"./isDeepEqual-CwWbk8GQ.js";var t=async()=>(await e.get(`/warehouses`)).data,n=async t=>(await e.post(`/warehouses`,t)).data,r=async(t,n)=>(await e.put(`/warehouses/${t}`,n)).data,i=async t=>(await e.delete(`/warehouses/${t}`)).data;export{r as i,i as n,t as r,n as t};
+//# sourceMappingURL=warehouses-Bsmg4ei6.js.map

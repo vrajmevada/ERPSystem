@@ -32,4 +32,20 @@
     <Folder Include="Middleware\" />
   </ItemGroup>
 
+  <!-- Automatically build the React Vite frontend and copy it to wwwroot when publishing -->
+  <Target Name="PublishRunWebpack" BeforeTargets="ComputeFilesToPublish">
+    <Message Importance="high" Text="Building frontend (Vite React)..." />
+    <Exec Command="npm run build" WorkingDirectory="..\erp-frontend\vite" />
+    
+    <Message Importance="high" Text="Cleaning old wwwroot files..." />
+    <RemoveDir Directories="wwwroot" />
+    <MakeDir Directories="wwwroot" />
+    
+    <Message Importance="high" Text="Copying new frontend build files to wwwroot..." />
+    <ItemGroup>
+      <FrontendBuildFiles Include="..\erp-frontend\vite\dist\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(FrontendBuildFiles)" DestinationFiles="@(FrontendBuildFiles->'wwwroot\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
+
 </Project>

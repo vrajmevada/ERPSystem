@@ -19,11 +19,3 @@ export const getLowStock = async () => {
   const response = await axiosServices.get('/reports/low-stock');
   return response.data;
 };
-
-export const getLowStock = async () => {
-    const response = await axios.get(
-        `${API_URL}/low-stock`,
-        getAuthHeaders()
-    );
-    return response.data;
-};

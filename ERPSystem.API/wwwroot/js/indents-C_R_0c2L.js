@@ -1,0 +1,2 @@
+import{_ as e}from"./isDeepEqual-CwWbk8GQ.js";var t=async(t=``,n=1,r=10)=>(await e.get(`/indents`,{params:{search:t,page:n,pageSize:r}})).data,n=async t=>(await e.get(`/indents/${t}`)).data,r=async t=>(await e.post(`/indents`,t)).data,i=async t=>(await e.put(`/indents/${t}/approve`)).data,a=async t=>(await e.put(`/indents/${t}/disapprove`)).data,o=async(t,n)=>(await e.put(`/indents/${t}/short-close`,n)).data;export{t as a,n as i,r as n,o,a as r,i as t};
+//# sourceMappingURL=indents-C_R_0c2L.js.map

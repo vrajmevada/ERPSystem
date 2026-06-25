@@ -1,0 +1,2 @@
+import{_ as e}from"./isDeepEqual-CwWbk8GQ.js";var t=async(t=``,n=1,r=10)=>(await e.get(`/transferslips`,{params:{search:t,page:n,pageSize:r}})).data,n=async t=>(await e.get(`/transferslips/${t}`)).data,r=async t=>(await e.post(`/transferslips`,t)).data,i=async t=>(await e.put(`/transferslips/${t}/ship`)).data,a=async t=>(await e.put(`/transferslips/${t}/receive`)).data,o=async(t,n)=>(await e.put(`/transferslips/${t}/short-close`,n)).data;export{i as a,a as i,n,o,t as r,r as t};
+//# sourceMappingURL=transferSlips-DNl1tHmQ.js.map
